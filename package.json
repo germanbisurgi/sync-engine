@@ -1,0 +1,35 @@
+{
+  "name": "@germanbisurgi/sync-engine",
+  "version": "0.1.0",
+  "description": "A 2d game engine",
+  "main": "dist/sync-engine.js",
+  "scripts": {
+    "start": "nodemon example/server/server.js",
+    "watch": "webpack --watch"
+  },
+  "author": "German Bisurgi",
+  "license": "MIT",
+  "resolutions": {
+    "acorn": "^7.1.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.8.3",
+    "@babel/plugin-transform-runtime": "^7.8.3",
+    "@babel/preset-env": "^7.8.3",
+    "@babel/runtime": "^7.9.2",
+    "babel-loader": "^8.0.6",
+    "eslint": "^6.8.0",
+    "eslint-config-standard": "^14.1.0",
+    "eslint-loader": "^3.0.3",
+    "eslint-plugin-import": "^2.20.0",
+    "eslint-plugin-node": "^11.0.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "express": "^4.17.1",
+    "live-server": "^1.2.1",
+    "nodemon": "^2.0.3",
+    "socket.io": "^2.3.0",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10"
+  }
+}
