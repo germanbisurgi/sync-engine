@@ -39,7 +39,7 @@ const client = Object.assign({}, common, {
     path: path.resolve(__dirname, 'example/client/libs'),
     filename: '[name].js',
     libraryExport: 'default',
-    library: 'SyncEngine',
+    library: 'SyncEngineClient',
     libraryTarget: 'umd'
   }
 })
@@ -52,7 +52,7 @@ const server = Object.assign({}, common, {
     path: path.resolve(__dirname, 'example/server/libs'),
     filename: '[name].js',
     libraryExport: 'default',
-    library: 'SyncEngine',
+    library: 'SyncEngineServer',
     libraryTarget: 'commonjs2'
   }
 })

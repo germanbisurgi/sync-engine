@@ -1,7 +1,34 @@
-import LoopSystem from './loop/loop-system'
+import Entities from './entities-system/entities-system'
+import Loop from './loop/loop'
+import Render from './render/render'
+import Scene from './scene-system/scene-system'
 
-const SyncEngine = function () {
-  this.loop = new LoopSystem()
+const SyncEngineClient = function () {
+  this.entities = new Entities()
+  this.loop = new Loop()
+  this.render = new Render()
+  this.scene = new Scene()
+
+  this.loop.onStep = () => {
+    if (this.scene.current) {
+      if (this.scene.mustCreate) {
+        this.scene.current.create(this)
+        this.scene.requestUpdate()
+      }
+      if (this.scene.mustUpdate) {
+        this.scene.current.update(this)
+      }
+    }
+    if (this.scene.mustSwitch) {
+      this.scene.current = this.scene.requested
+      this.scene.requestCreate()
+    }
+  }
 }
 
-export default SyncEngine
+SyncEngineClient.prototype.start = function () {
+  this.render.run()
+  this.loop.run()
+}
+
+export default SyncEngineClient
