@@ -30,15 +30,17 @@ io.on('connection', (client) => {
 })
 
 const engine = new SyncEngineServer()
+let entity
 const scene = engine.scene.create({
   create: (engine) => {
     console.log('...create', engine.loop.frame)
-    const entity = engine.entities.create({
+    entity = engine.entities.create({
       x: 100,
       y: 100
     })
   },
   update: (engine) => {
+    entity.x += 1
     console.log('...update', engine.loop.frame, engine.entities.cache)
     io.emit('server-update', engine.entities.cache)
   }

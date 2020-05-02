@@ -1,11 +1,13 @@
 import Entities from './entities-system/entities-system'
 import Loop from './loop/loop'
+import Network from './network-system/network-system-client'
 import Render from './render/render'
 import Scene from './scene-system/scene-system'
 
 const SyncEngineClient = function () {
   this.entities = new Entities()
   this.loop = new Loop()
+  this.network = new Network()
   this.render = new Render()
   this.scene = new Scene()
 
