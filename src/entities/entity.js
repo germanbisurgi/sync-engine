@@ -1,6 +1,6 @@
 const Entity = function (params) {
   const config = Object.assign({
-    uuid: '',
+    id: '',
     x: 0,
     y: 0
   }, params)
