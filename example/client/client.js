@@ -12,11 +12,6 @@ const engine = new SyncEngineClient({
 })
 const scene = engine.scene.create({
   create: (engine) => {
-    engine.network.onConnection = (clientId) => {
-      engine.network.clientId = clientId
-      console.log('connection', engine.network.clientId)
-    }
-    // client
     engine.inputs.enableKey('w')
     engine.inputs.enableKey('a')
     engine.inputs.enableKey('s')
@@ -26,6 +21,7 @@ const scene = engine.scene.create({
   update: (engine) => {
     // move this client player
     const entity = engine.entities.cache[engine.network.clientId]
+
     if (engine.inputs.getKey('w').hold === true) {
       entity.y += -100 * engine.inputs.getKey('w').delta / 1000
     }

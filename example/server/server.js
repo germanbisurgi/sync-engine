@@ -28,7 +28,7 @@ const engine = new SyncEngineServer({
     socket: socket
   },
   loop: {
-    fps: 1
+    fps: 10
   }
 })
 

@@ -5,15 +5,13 @@ const Network = function (config) {
   this.clientInputs = []
 
   this.socket.on('connection', (clientId) => {
-    this.onConnection(clientId)
+    this.clientId = clientId
   })
 
   this.socket.on('entities', (entities) => {
     this.entities = entities
   })
 }
-
-Network.prototype.onConnection = function () {}
 
 Network.prototype.sendInputs = function (inputs) {
   this.socket.emit('client-inputs', {
