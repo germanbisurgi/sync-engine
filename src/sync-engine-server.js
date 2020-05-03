@@ -1,12 +1,12 @@
-import Entities from './entities-system/entities-system'
+import Entities from './entities/entities-system'
 import Loop from './loop/loop'
-import Network from './network-system/network-system-server'
-import Scene from './scene-system/scene-system'
+import Network from './network/network-system-server'
+import Scene from './scene/scene-system'
 
-const SyncEngineServer = function () {
+const SyncEngineServer = function (config) {
   this.entities = new Entities()
-  this.loop = new Loop()
-  this.network = new Network()
+  this.loop = new Loop(config.loop)
+  this.network = new Network(config.network)
   this.scene = new Scene()
 
   this.loop.onStep = () => {
@@ -17,6 +17,8 @@ const SyncEngineServer = function () {
       }
       if (this.scene.mustUpdate) {
         this.scene.current.update(this)
+        console.log(this.entities.cache)
+        this.network.sendEntities(this.entities.cache)
       }
     }
     if (this.scene.mustSwitch) {

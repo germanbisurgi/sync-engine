@@ -1,5 +1,5 @@
-const Loop = function () {
-  this.fps = 1
+const Loop = function (config) {
+  this.fps = config.fps
   this.frame = 0
 }
 
