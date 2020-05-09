@@ -28,7 +28,7 @@ const engine = new SyncEngineServer({
     socket: socket
   },
   loop: {
-    fps: 10
+    fps: 30
   }
 })
 
@@ -39,10 +39,12 @@ const scene = engine.scene.create({
     }
 
     engine.network.onDisconnect = function (clientId) {
+      // todo: entine.entities.destroy(entity)
       delete engine.entities.cache[clientId]
     }
   },
   update: (engine) => {
+    // physics update
     for (const i in engine.network.clients) {
       if (!Object.prototype.hasOwnProperty.call(engine.network.clients, i)) {
         continue
@@ -53,16 +55,16 @@ const scene = engine.scene.create({
 
       inputs.forEach((inputs) => {
         if (inputs.keys.w && inputs.keys.w.hold === true) {
-          entity.y += -100 * inputs.keys.w.delta / 1000
+          entity.y += -200 * inputs.keys.w.delta / 1000
         }
         if (inputs.keys.a && inputs.keys.a.hold === true) {
-          entity.x -= 100 * inputs.keys.a.delta / 1000
+          entity.x -= 200 * inputs.keys.a.delta / 1000
         }
         if (inputs.keys.s && inputs.keys.s.hold === true) {
-          entity.y += 100 * inputs.keys.s.delta / 1000
+          entity.y += 200 * inputs.keys.s.delta / 1000
         }
         if (inputs.keys.d && inputs.keys.d.hold === true) {
-          entity.x += 100 * inputs.keys.d.delta / 1000
+          entity.x += 200 * inputs.keys.d.delta / 1000
         }
       })
 

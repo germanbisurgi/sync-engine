@@ -18,7 +18,7 @@ const SyncEngineServer = function (config) {
       if (this.scene.mustUpdate) {
         this.scene.current.update(this)
         console.log(this.entities.cache)
-        this.network.sendEntities(this.entities.cache)
+        this.network.serverUpdate(this.entities.cache)
       }
     }
     if (this.scene.mustSwitch) {

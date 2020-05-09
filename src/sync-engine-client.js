@@ -20,7 +20,7 @@ const SyncEngineClient = function (config) {
         this.scene.requestUpdate()
       }
       if (this.scene.mustUpdate) {
-        this.entities.cache = this.network.entities
+        this.entities.cache = this.network.getCurrentState()
         this.inputs.update()
         this.network.sendInputs(this.inputs.cache)
         this.render.update(this.entities.cache)

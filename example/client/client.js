@@ -20,19 +20,28 @@ const scene = engine.scene.create({
   },
   update: (engine) => {
     // move this client player
-    const entity = engine.entities.cache[engine.network.clientId]
+    const interpolate = false
+    const reconciliate = false
 
-    if (engine.inputs.getKey('w').hold === true) {
-      entity.y += -100 * engine.inputs.getKey('w').delta / 1000
+    if (interpolate) {
+      const entity = engine.entities.cache[engine.network.clientId]
+
+      if (engine.inputs.getKey('w').hold === true) {
+        entity.y += -200 * engine.inputs.getKey('w').delta / 1000
+      }
+      if (engine.inputs.getKey('a').hold === true) {
+        entity.x -= 200 * engine.inputs.getKey('a').delta / 1000
+      }
+      if (engine.inputs.getKey('s').hold === true) {
+        entity.y += 200 * engine.inputs.getKey('s').delta / 1000
+      }
+      if (engine.inputs.getKey('d').hold === true) {
+        entity.x += 200 * engine.inputs.getKey('d').delta / 1000
+      }
     }
-    if (engine.inputs.getKey('a').hold === true) {
-      entity.x -= 100 * engine.inputs.getKey('a').delta / 1000
-    }
-    if (engine.inputs.getKey('s').hold === true) {
-      entity.y += 100 * engine.inputs.getKey('s').delta / 1000
-    }
-    if (engine.inputs.getKey('d').hold === true) {
-      entity.x += 100 * engine.inputs.getKey('d').delta / 1000
+
+    if (reconciliate) {
+      // todo: implement reconciliate
     }
   }
 })

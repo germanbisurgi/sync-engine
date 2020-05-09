@@ -30,8 +30,11 @@ Network.prototype.onConnection = function () {}
 
 Network.prototype.onDisconnect = function () {}
 
-Network.prototype.sendEntities = function (entities) {
-  this.socket.emit('entities', entities)
+Network.prototype.serverUpdate = function (entities) {
+  this.socket.emit('server-update', {
+    timestamp: Date.now(),
+    entities: entities
+  })
 }
 
 Network.prototype.update = function (entities) {
