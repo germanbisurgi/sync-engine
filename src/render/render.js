@@ -3,7 +3,12 @@ const Render = function () {
   this.context = this.canvas.getContext('2d')
   this.canvas.height = window.innerHeight
   this.canvas.width = window.innerWidth
+  this.imagesCache = {}
   this.entities = {}
+}
+
+Render.prototype.getImage = function (image) {
+  return this.imagesCache[image]
 }
 
 Render.prototype.clear = function () {
@@ -21,12 +26,46 @@ Render.prototype.draw = function () {
     if (Object.prototype.hasOwnProperty.call(this.entities, i)) {
       const entity = this.entities[i]
       this.context.save()
+
+      this.context.translate(
+        entity.x + entity.w * 0.5 * entity.s - entity.w * entity.ax * entity.s,
+        entity.y + entity.h * 0.5 * entity.s - entity.h * entity.ay * entity.s
+      )
+      this.context.rotate(entity.a)
+
+      this.context.scale(
+        entity.s,
+        entity.s
+      )
+
+      const image = this.getImage(entity.image)
+
+      if (entity.sw === 0) {
+        entity.sw = image.width
+      }
+
+      if (entity.sh === 0) {
+        entity.sh = image.height
+      }
+
+      this.context.drawImage(
+        image,
+        entity.sx,
+        entity.sy,
+        entity.sw,
+        entity.sh,
+        entity.w * -0.5, // do not touch this
+        entity.h * -0.5, // do not touch this
+        entity.w, // do not touch this
+        entity.h // do not touch this
+      )
       // circle
-      this.context.lineWidth = '1'
-      this.context.strokeStyle = '#00ff00'
-      this.context.beginPath()
-      this.context.arc(entity.x, entity.y, 30, 0, 2 * Math.PI)
-      this.context.stroke()
+      // this.context.lineWidth = '1'
+      // this.context.strokeStyle = '#00ff00'
+      // this.context.beginPath()
+      // this.context.arc(entity.x, entity.y, 30, 0, 2 * Math.PI)
+      // this.context.stroke()
+
       this.context.restore()
     }
   }

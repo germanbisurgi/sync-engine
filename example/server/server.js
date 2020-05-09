@@ -25,17 +25,24 @@ const socket = socketio(server)
 
 const engine = new SyncEngineServer({
   network: {
-    socket: socket
+    socket: socket,
+    ups: 10
   },
   loop: {
-    fps: 30
+    fps: 60
   }
 })
 
 const scene = engine.scene.create({
   create: (engine) => {
     engine.network.onConnection = function (clientId) {
-      engine.entities.create({ id: clientId, x: 100, y: 100 })
+      engine.entities.create({
+        id: clientId,
+        x: 400 * (0.25 + Math.random() * 0.5),
+        y: 400 * (0.25 + Math.random() * 0.5),
+        angle: 0,
+        image: 'token'
+      })
     }
 
     engine.network.onDisconnect = function (clientId) {
@@ -66,6 +73,7 @@ const scene = engine.scene.create({
         if (inputs.keys.d && inputs.keys.d.hold === true) {
           entity.x += 200 * inputs.keys.d.delta / 1000
         }
+        entity.a += 0.25
       })
 
       client.inputs = []

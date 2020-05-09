@@ -6,7 +6,7 @@ import Scene from './scene/scene-system'
 const SyncEngineServer = function (config) {
   this.entities = new Entities()
   this.loop = new Loop(config.loop)
-  this.network = new Network(config.network)
+  this.network = new Network(config.network, this)
   this.scene = new Scene()
 
   this.loop.onStep = () => {
@@ -16,9 +16,8 @@ const SyncEngineServer = function (config) {
         this.scene.requestUpdate()
       }
       if (this.scene.mustUpdate) {
+        console.log('traffic', JSON.stringify(this.entities.cache).split('').length)
         this.scene.current.update(this)
-        console.log(this.entities.cache)
-        this.network.serverUpdate(this.entities.cache)
       }
     }
     if (this.scene.mustSwitch) {

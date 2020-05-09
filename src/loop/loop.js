@@ -1,4 +1,7 @@
-const Loop = function (config) {
+const Loop = function (params) {
+  const config = Object.assign({
+    fps: 50
+  }, params)
   this.fps = config.fps
   this.frame = 0
 }

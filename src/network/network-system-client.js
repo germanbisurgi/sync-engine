@@ -1,9 +1,13 @@
-const Network = function (config) {
+const Network = function (params) {
+  const config = Object.assign({
+    socket: null,
+    interpolationDelay: 100
+  }, params)
   this.socket = config.socket
+  this.interpolationDelay = config.interpolationDelay
   this.clientId = ''
   this.entities = {}
   this.serverUpdates = []
-  this.renderDelay = 50
   this.firstServerTimestamp = 0
   this.firstClientTimestamp = 0
 
@@ -49,8 +53,6 @@ Network.prototype.getCurrentState = function () {
     const baseUpdate = this.serverUpdates[base]
     const next = this.serverUpdates[base + 1]
     const r = (serverTime - baseUpdate.timestamp) / (next.timestamp - baseUpdate.timestamp)
-    // console.log(this.serverUpdates.length)
-    // todo: interpolate entities
     const interpolated = {}
 
     for (const i in baseUpdate.entities) {
@@ -58,27 +60,35 @@ Network.prototype.getCurrentState = function () {
         continue
       }
 
-      const entity1 = baseUpdate.entities[i]
-      const entity2 = next.entities[i]
+      const olderEntity = baseUpdate.entities[i]
+      const newerEntity = typeof next.entities[i] !== 'undefined' ? next.entities[i] : olderEntity
       interpolated[i] = {
-        x: this.interpolate(entity1.x, entity2.x, r),
-        y: this.interpolate(entity1.y, entity2.y, r)
+        id: newerEntity.id,
+        x: this.interpolate(olderEntity.x, newerEntity.x, r),
+        y: this.interpolate(olderEntity.y, newerEntity.y, r),
+        a: this.interpolate(olderEntity.a, newerEntity.a, r),
+        image: newerEntity.image,
+        sx: newerEntity.sx,
+        sy: newerEntity.sy,
+        sw: newerEntity.sw,
+        sh: newerEntity.sh,
+        w: newerEntity.w,
+        h: newerEntity.h,
+        ax: newerEntity.ax,
+        ay: newerEntity.ay,
+        s: newerEntity.s
       }
     }
-    // console.log(interpolated)
     return interpolated
   }
 }
 
 Network.prototype.interpolate = function (older, newer, ratio) {
-  if (!newer) {
-    return older
-  }
   return older + (newer - older) * ratio
 }
 
 Network.prototype.currentServerTime = function () {
-  return this.firstServerTimestamp + (Date.now() - this.firstClientTimestamp) - this.renderDelay
+  return this.firstServerTimestamp + (Date.now() - this.firstClientTimestamp) - this.interpolationDelay
 }
 
 Network.prototype.getBaseUpdate = function () {
@@ -92,7 +102,7 @@ Network.prototype.getBaseUpdate = function () {
 }
 
 Network.prototype.getCurrentServerTimestamp = function (inputs) {
-  return this.firstServerTimestamp + (Date.now() - this.firstClientTimestamp) - this.renderDelay
+  return this.firstServerTimestamp + (Date.now() - this.firstClientTimestamp) - this.interpolationDelay
 }
 
 Network.prototype.sendInputs = function (inputs) {

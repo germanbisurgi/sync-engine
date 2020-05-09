@@ -1,6 +1,15 @@
-const Network = function (config) {
+const Network = function (params, engine) {
+  const config = Object.assign({
+    ups: 30,
+    socket: null
+  }, params)
+  this.engine = engine
+  this.ups = config.ups
   this.socket = config.socket
   this.clients = {}
+  this.interval = setInterval(() => {
+    this.serverUpdate()
+  }, 1000 / this.ups)
 
   this.socket.on('connection', (client) => {
     // add client to the client list
@@ -30,10 +39,10 @@ Network.prototype.onConnection = function () {}
 
 Network.prototype.onDisconnect = function () {}
 
-Network.prototype.serverUpdate = function (entities) {
+Network.prototype.serverUpdate = function () {
   this.socket.emit('server-update', {
     timestamp: Date.now(),
-    entities: entities
+    entities: this.engine.entities.cache
   })
 }
 
