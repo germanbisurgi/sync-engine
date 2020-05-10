@@ -13,7 +13,8 @@ const Entity = function (params) {
     h: 50,
     ax: 0.5,
     ay: 0.5,
-    s: 1
+    s: 1,
+    v: true
   }, params)
 
   // todo: bodyId
@@ -32,6 +33,7 @@ const Entity = function (params) {
   this.ax = config.ax
   this.ay = config.ay
   this.s = config.s
+  this.v = config.v
 }
 
 export default Entity

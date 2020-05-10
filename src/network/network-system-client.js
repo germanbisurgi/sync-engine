@@ -7,6 +7,7 @@ const Network = function (params) {
   this.interpolationDelay = config.interpolationDelay
   this.clientId = ''
   this.entities = {}
+  this.shapes = []
   this.serverUpdates = []
   this.firstServerTimestamp = 0
   this.firstClientTimestamp = 0
@@ -16,6 +17,7 @@ const Network = function (params) {
   })
 
   this.socket.on('server-update', (data) => {
+    this.shapes = data.shapes
     this.processGameUpdate(data)
   })
 }
@@ -76,7 +78,8 @@ Network.prototype.getCurrentState = function () {
         h: newerEntity.h,
         ax: newerEntity.ax,
         ay: newerEntity.ay,
-        s: newerEntity.s
+        s: newerEntity.s,
+        v: newerEntity.v
       }
     }
     return interpolated

@@ -5,10 +5,13 @@ const socket = io()
 const engine = new SyncEngineClient({
   network: {
     socket: socket,
-    interpolationDelay: 100
+    interpolationDelay: 0
   },
   loop: {
     fps: 60
+  },
+  physics: {
+    debug: true
   }
 })
 const scene = engine.scene.create({
@@ -20,7 +23,16 @@ const scene = engine.scene.create({
     engine.inputs.enableKey('a')
     engine.inputs.enableKey('s')
     engine.inputs.enableKey('d')
+    engine.inputs.enableKey(' ')
     engine.inputs.enablePointer('0')
+
+    engine.render.shapes = [
+      { type: 'edge', vertices: [{ x: 10, y: 460 }, { x: 10, y: 10 }] },
+      { type: 'edge', vertices: [{ x: 810, y: 460 }, { x: 10, y: 460 }] },
+      { type: 'edge', vertices: [{ x: 810, y: 10 }, { x: 810, y: 460 }] },
+      { type: 'edge', vertices: [{ x: 10, y: 10 }, { x: 810, y: 10 }] }
+    ]
+
   }/* ,
   update: (engine) => {
     const interpolate = false

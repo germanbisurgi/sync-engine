@@ -2,6 +2,7 @@ import Entities from './entities/entities-system'
 import Loader from './loader/loader'
 import Loop from './loop/loop'
 import Inputs from './inputs/inputs-client'
+import Physics from './physics/physics-system'
 import Network from './network/network-system-client'
 import Render from './render/render'
 import Scene from './scene/scene-system'
@@ -11,6 +12,7 @@ const SyncEngineClient = function (config) {
   this.loader = new Loader()
   this.loop = new Loop(config.loop)
   this.inputs = new Inputs()
+  this.physics = new Physics(config.physics)
   this.network = new Network(config.network)
   this.render = new Render()
   this.scene = new Scene()
@@ -35,6 +37,7 @@ const SyncEngineClient = function (config) {
         this.entities.cache = this.network.getCurrentState()
         this.inputs.update()
         this.network.sendInputs(this.inputs.cache)
+        // this.render.shapes = this.network.shapes
         this.render.update(this.entities.cache)
         this.scene.current.update(this)
       }

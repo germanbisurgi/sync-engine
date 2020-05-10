@@ -4,6 +4,7 @@ const Render = function () {
   this.canvas.height = window.innerHeight
   this.canvas.width = window.innerWidth
   this.imagesCache = {}
+  this.shapes = []
   this.entities = {}
 }
 
@@ -25,6 +26,11 @@ Render.prototype.draw = function () {
   for (const i in this.entities) {
     if (Object.prototype.hasOwnProperty.call(this.entities, i)) {
       const entity = this.entities[i]
+
+      if (!entity.v) {
+        continue
+      }
+
       this.context.save()
 
       this.context.translate(
@@ -59,16 +65,29 @@ Render.prototype.draw = function () {
         entity.w, // do not touch this
         entity.h // do not touch this
       )
-      // circle
-      // this.context.lineWidth = '1'
-      // this.context.strokeStyle = '#00ff00'
-      // this.context.beginPath()
-      // this.context.arc(entity.x, entity.y, 30, 0, 2 * Math.PI)
-      // this.context.stroke()
-
       this.context.restore()
     }
   }
+
+  // console.log(this.shapes)
+  this.shapes.forEach((shape) => {
+    this.context.save()
+    this.context.lineWidth = '1'
+    this.context.strokeStyle = '#00ff00'
+    switch (shape.type) {
+      case 'circle':
+        this.context.beginPath()
+        this.context.arc(shape.x, shape.y, shape.radius, 0, 2 * Math.PI)
+        this.context.stroke()
+        break
+      case 'edge':
+        this.context.beginPath()
+        this.context.moveTo(shape.vertices[0].x, shape.vertices[0].y)
+        this.context.lineTo(shape.vertices[1].x, shape.vertices[1].y)
+        this.context.stroke()
+    }
+  })
+  this.context.restore()
 }
 
 Render.prototype.update = function (entities) {

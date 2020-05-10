@@ -26,29 +26,60 @@ const socket = socketio(server)
 const engine = new SyncEngineServer({
   network: {
     socket: socket,
-    ups: 10
+    ups: 30
   },
   loop: {
     fps: 60
+  },
+  physics: {
+    fps: 60,
+    debug: false
   }
 })
 
 const scene = engine.scene.create({
   create: (engine) => {
     engine.network.onConnection = function (clientId) {
-      engine.entities.create({
+      const entity = engine.entities.create({
         id: clientId,
-        x: 400 * (0.25 + Math.random() * 0.5),
-        y: 400 * (0.25 + Math.random() * 0.5),
         angle: 0,
         image: 'token'
+      })
+
+      engine.physics.createBody(entity, {
+        x: 400 * (0.25 + Math.random() * 0.5),
+        y: 400 * (0.25 + Math.random() * 0.5),
+        linearDamping: 0
+      })
+
+      engine.physics.addCircle(entity, {
+        radius: 25,
+        restitution: 0
       })
     }
 
     engine.network.onDisconnect = function (clientId) {
       // todo: entine.entities.destroy(entity)
       delete engine.entities.cache[clientId]
+      delete engine.physics.bodies[clientId]
+      delete engine.physics.shapes[clientId]
     }
+
+    const width = 1600 / 2
+    const height = 900 / 2
+    const edges = engine.entities.create({
+      v: false
+    })
+    engine.physics.createBody(edges, { x: 10, y: 10, type: 'static' })
+    engine.physics.addEdge(edges, { ax: 0, ay: 0, bx: width, by: 0 })
+    engine.physics.addEdge(edges, { ax: width, ay: 0, bx: width, by: height })
+    engine.physics.addEdge(edges, { ax: width, ay: height, bx: 0, by: height })
+    engine.physics.addEdge(edges, { ax: 0, ay: height, bx: 0, by: 0 })
+
+    // engine.physics.setGravity({
+    //   x: 0,
+    //   y: 9
+    // })
   },
   update: (engine) => {
     // physics update
@@ -59,23 +90,37 @@ const scene = engine.scene.create({
       const client = engine.network.clients[i]
       const inputs = client.inputs
       const entity = engine.entities.cache[client.id]
+      const force = 5000 / 100
 
       inputs.forEach((inputs) => {
         if (inputs.keys.w && inputs.keys.w.hold === true) {
-          entity.y += -200 * inputs.keys.w.delta / 1000
+          engine.physics.applyForce(entity, {
+            x: 0,
+            y: -force * inputs.keys.w.delta / 1000
+          })
         }
         if (inputs.keys.a && inputs.keys.a.hold === true) {
-          entity.x -= 200 * inputs.keys.a.delta / 1000
+          engine.physics.applyForce(entity, {
+            x: -force * inputs.keys.a.delta / 1000,
+            y: 0
+          })
         }
         if (inputs.keys.s && inputs.keys.s.hold === true) {
-          entity.y += 200 * inputs.keys.s.delta / 1000
+          engine.physics.applyForce(entity, {
+            x: 0,
+            y: force * inputs.keys.s.delta / 1000
+          })
         }
         if (inputs.keys.d && inputs.keys.d.hold === true) {
-          entity.x += 200 * inputs.keys.d.delta / 1000
+          engine.physics.applyForce(entity, {
+            x: force * inputs.keys.d.delta / 1000,
+            y: 0
+          })
         }
-        entity.a += 0.25
+        if (inputs.keys[' '] && inputs.keys[' '].start === true) {
+          engine.physics.applyTorque(entity, 500)
+        }
       })
-
       client.inputs = []
     }
   }

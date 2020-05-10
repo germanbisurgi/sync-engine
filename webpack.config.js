@@ -28,6 +28,9 @@ const common = {
   },
   optimization: {
     minimize: false
+  },
+  performance: {
+    hints: false
   }
 }
 

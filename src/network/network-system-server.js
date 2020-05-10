@@ -40,9 +40,12 @@ Network.prototype.onConnection = function () {}
 Network.prototype.onDisconnect = function () {}
 
 Network.prototype.serverUpdate = function () {
+  // const megabits = JSON.stringify(this.engine.entities.cache).split('').length * 16 * this.engine.network.ups / 1000000
+  // console.log('traffic in Mbps:', megabits)
   this.socket.emit('server-update', {
     timestamp: Date.now(),
-    entities: this.engine.entities.cache
+    entities: this.engine.entities.cache,
+    shapes: this.engine.physics.shapes
   })
 }
 
