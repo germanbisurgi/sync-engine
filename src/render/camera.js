@@ -5,7 +5,7 @@ const Camera = function () {
   this.h = 0
   this.z = 1
   this.a = 0
-  this.l = 0.1
+  this.l = 0.5
 
   this.resize()
 

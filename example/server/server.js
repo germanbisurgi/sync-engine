@@ -66,32 +66,40 @@ const scene = engine.scene.create({
     }
 
     // --------------------------------------------------------------------- map
-    const mapWidth = 1200
-    const mapHeight = 800
+
+    const width = 2400
+    const height = 1600
 
     const map = engine.entities.create({
       image: 'arena',
-      w: mapWidth,
-      h: mapHeight
+      w: width,
+      h: height
     })
+
+    const size = 720
+    const sides = 30
+    const centerX = 0
+    const centerY = 0
+    const vertices = []
+
+    for (let i = 0; i <= sides; i++) {
+      const v = {
+        x: centerX + size * Math.cos(i * 2 * Math.PI / sides),
+        y: centerY + size * Math.sin(i * 2 * Math.PI / sides)
+      }
+      vertices.push(v)
+    }
+
     engine.physics.createBody(map, { x: 0, y: 0, type: 'static' })
-    engine.physics.addCircle(map, { radius: 400 })
 
-    const width = 1600 / 2
-    const height = 900 / 2
-    const edges = engine.entities.create({
-      v: false
-    })
-    engine.physics.createBody(edges, { x: 10, y: 10, type: 'static' })
-    engine.physics.addEdge(edges, { ax: 0, ay: 0, bx: width, by: 0 })
-    engine.physics.addEdge(edges, { ax: width, ay: 0, bx: width, by: height })
-    engine.physics.addEdge(edges, { ax: width, ay: height, bx: 0, by: height })
-    engine.physics.addEdge(edges, { ax: 0, ay: height, bx: 0, by: 0 })
-
-    // engine.physics.setGravity({
-    //   x: 0,
-    //   y: 9
-    // })
+    for (let i = 0; i < vertices.length; i++) {
+      engine.physics.addEdge(map, {
+        ax: vertices[i].x,
+        ay: vertices[i].y,
+        bx: typeof vertices[i + 1] !== 'undefined' ? vertices[i + 1].x : vertices[0].x,
+        by: typeof vertices[i + 1] !== 'undefined' ? vertices[i + 1].y : vertices[0].y
+      })
+    }
   },
   update: (engine) => {
     // physics update

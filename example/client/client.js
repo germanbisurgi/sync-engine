@@ -28,6 +28,7 @@ const scene = engine.scene.create({
     engine.inputs.enableKey('4')
     engine.inputs.enableKey('5')
     engine.inputs.enableKey('6')
+    engine.inputs.enableKey('2')
     engine.inputs.enableKey(' ')
     engine.inputs.enablePointer('0')
 
@@ -37,7 +38,7 @@ const scene = engine.scene.create({
       { type: 'edge', vertices: [{ x: 810, y: 10 }, { x: 810, y: 460 }] },
       { type: 'edge', vertices: [{ x: 10, y: 10 }, { x: 810, y: 10 }] }
     ]
-    engine.render.camera.z = 0.4
+    engine.render.camera.z = 0.5
   },
   update: (engine) => {
     // if player is connected
@@ -51,11 +52,15 @@ const scene = engine.scene.create({
       if (engine.inputs.getKey('4').hold === true) {
         engine.render.camera.a += 0.05
       }
-      if (engine.inputs.getKey('5').hold === true) {
+      if (engine.inputs.getKey('2').hold === true) {
         engine.render.camera.z -= 0.01
       }
       if (engine.inputs.getKey('6').hold === true) {
         engine.render.camera.a -= 0.05
+      }
+      if (engine.inputs.getKey('5').hold === true) {
+        engine.render.camera.a = 0
+        engine.render.camera.z = 1
       }
     }
 
