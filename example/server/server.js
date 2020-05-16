@@ -33,7 +33,7 @@ const engine = new SyncEngineServer({
   },
   physics: {
     fps: 60,
-    debug: false
+    debug: true
   }
 })
 
@@ -47,8 +47,8 @@ const scene = engine.scene.create({
       })
 
       engine.physics.createBody(entity, {
-        x: 400 * (0.25 + Math.random() * 0.5),
-        y: 400 * (0.25 + Math.random() * 0.5),
+        x: 0,
+        y: 0,
         linearDamping: 0
       })
 
@@ -64,6 +64,18 @@ const scene = engine.scene.create({
       delete engine.physics.bodies[clientId]
       delete engine.physics.shapes[clientId]
     }
+
+    // --------------------------------------------------------------------- map
+    const mapWidth = 1200
+    const mapHeight = 800
+
+    const map = engine.entities.create({
+      image: 'arena',
+      w: mapWidth,
+      h: mapHeight
+    })
+    engine.physics.createBody(map, { x: 0, y: 0, type: 'static' })
+    engine.physics.addCircle(map, { radius: 400 })
 
     const width = 1600 / 2
     const height = 900 / 2
@@ -117,7 +129,7 @@ const scene = engine.scene.create({
             y: 0
           })
         }
-        if (inputs.keys[' '] && inputs.keys[' '].start === true) {
+        if (inputs.keys[' '] && inputs.keys[' '].hold === true) {
           engine.physics.applyTorque(entity, 500)
         }
       })

@@ -1,8 +1,11 @@
+import Camera from './camera'
+
 const Render = function () {
   this.canvas = document.querySelector('#render-canvas')
   this.context = this.canvas.getContext('2d')
   this.canvas.height = window.innerHeight
   this.canvas.width = window.innerWidth
+  this.camera = new Camera()
   this.imagesCache = {}
   this.shapes = []
   this.entities = {}
@@ -23,19 +26,55 @@ Render.prototype.run = function () {
 
 Render.prototype.draw = function () {
   this.clear()
+
+  // camera
+
+  this.context.save()
+
+  // translate to camera center
+  this.context.translate(
+    (this.camera.w / 2),
+    (this.camera.h / 2)
+  )
+
+  // rotate
+  this.context.rotate(this.camera.a)
+
+  // scale
+  this.context.scale(this.camera.z, this.camera.z)
+
+  this.context.strokeStyle = 'red'
+  this.context.lineWidth = '3'
+  this.context.beginPath()
+  this.context.arc(0, 0, 50, 0, 2 * Math.PI)
+  this.context.stroke()
+
+  this.context.translate(
+    -(this.camera.w / 2),
+    -(this.camera.h / 2)
+  )
+
+  // translate
+  this.context.translate(
+    -this.camera.x,
+    -this.camera.y
+  )
+
+  // entities
+
   for (const i in this.entities) {
     if (Object.prototype.hasOwnProperty.call(this.entities, i)) {
       const entity = this.entities[i]
 
-      if (!entity.v) {
+      if (!entity.v || !entity.image) {
         continue
       }
 
       this.context.save()
 
       this.context.translate(
-        entity.x + entity.w * 0.5 * entity.s - entity.w * entity.ax * entity.s,
-        entity.y + entity.h * 0.5 * entity.s - entity.h * entity.ay * entity.s
+        (entity.x + entity.w * 0.5 * entity.s - entity.w * entity.ax * entity.s),
+        (entity.y + entity.h * 0.5 * entity.s - entity.h * entity.ay * entity.s)
       )
       this.context.rotate(entity.a)
 
@@ -86,6 +125,7 @@ Render.prototype.draw = function () {
         this.context.lineTo(shape.vertices[1].x, shape.vertices[1].y)
         this.context.stroke()
     }
+    this.context.restore()
   })
   this.context.restore()
 }

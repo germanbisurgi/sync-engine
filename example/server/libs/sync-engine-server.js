@@ -12858,7 +12858,6 @@ physics_system_PhysicsSystem.prototype.createBody = function (entity, params) {
 physics_system_PhysicsSystem.prototype.update = function () {
   var _this = this;
 
-  console.log(Object.keys(this.bodies).length);
   this.world.Step(1 / this.fps, 8, 3);
   this.world.ClearForces();
 

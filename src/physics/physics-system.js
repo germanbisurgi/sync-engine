@@ -74,7 +74,6 @@ PhysicsSystem.prototype.createBody = function (entity, params) {
 }
 
 PhysicsSystem.prototype.update = function () {
-  console.log(Object.keys(this.bodies).length)
   this.world.Step(1 / this.fps, 8, 3)
   this.world.ClearForces()
   for (const i in this.bodies) {
