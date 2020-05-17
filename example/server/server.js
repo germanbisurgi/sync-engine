@@ -46,15 +46,10 @@ const scene = engine.scene.create({
         image: 'token'
       })
 
-      engine.world.createBody(entity, {
-        x: 0,
-        y: 0,
-        linearDamping: 0
-      })
+      engine.world.createBody(entity, {})
 
       engine.world.addCircle(entity, {
-        radius: 25,
-        restitution: 0
+        radius: 25
       })
     }
 
@@ -63,9 +58,9 @@ const scene = engine.scene.create({
       engine.world.destroyEntity(entity)
     }
 
-    const rectangle = engine.world.createEntity()
-    engine.world.createBody(rectangle, {})
-    engine.world.addRectangle(rectangle, {})
+    // const rectangle = engine.world.createEntity()
+    // engine.world.createBody(rectangle, {})
+    // engine.world.addRectangle(rectangle, {})
 
     // --------------------------------------------------------------------- map
 
@@ -80,7 +75,7 @@ const scene = engine.scene.create({
 
     const size = 720
     const sides = 50
-    const centerX = 0
+    const centerX = -10
     const centerY = 0
     const vertices = []
 
@@ -102,6 +97,16 @@ const scene = engine.scene.create({
         by: typeof vertices[i + 1] !== 'undefined' ? vertices[i + 1].y : vertices[0].y
       })
     }
+
+    const ball = engine.world.createEntity({
+      image: 'ball'
+    })
+
+    engine.world.createBody(ball, {})
+
+    engine.world.addCircle(ball, {
+      radius: 25
+    })
   },
   update: (engine) => {
     // physics update

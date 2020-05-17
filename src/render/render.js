@@ -70,7 +70,6 @@ Render.prototype.draw = function () {
   )
 
   // entities
-
   for (const i in this.entities) {
     if (Object.prototype.hasOwnProperty.call(this.entities, i)) {
       const entity = this.entities[i]
