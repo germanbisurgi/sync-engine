@@ -31,38 +31,38 @@ const engine = new SyncEngineServer({
   loop: {
     fps: 60
   },
-  physics: {
-    fps: 60,
-    debug: true
+  world: {
+    physics: {
+      fps: 60,
+      debug: true
+    }
   }
 })
 
 const scene = engine.scene.create({
   create: (engine) => {
     engine.network.onConnection = function (clientId) {
-      const entity = engine.entities.create({
+      const entity = engine.world.createEntity({
         id: clientId,
         angle: 0,
         image: 'token'
       })
 
-      engine.physics.createBody(entity, {
+      engine.world.createBody(entity, {
         x: 0,
         y: 0,
         linearDamping: 0
       })
 
-      engine.physics.addCircle(entity, {
+      engine.world.addCircle(entity, {
         radius: 25,
         restitution: 0
       })
     }
 
     engine.network.onDisconnect = function (clientId) {
-      // todo: entine.entities.destroy(entity)
-      delete engine.entities.cache[clientId]
-      delete engine.physics.bodies[clientId]
-      delete engine.physics.shapes[clientId]
+      const entity = engine.world.getEntity(clientId)
+      engine.world.destroyEntity(entity)
     }
 
     // --------------------------------------------------------------------- map
@@ -70,14 +70,14 @@ const scene = engine.scene.create({
     const width = 2400
     const height = 1600
 
-    const map = engine.entities.create({
+    const map = engine.world.createEntity({
       image: 'arena',
       w: width,
       h: height
     })
 
     const size = 720
-    const sides = 30
+    const sides = 50
     const centerX = 0
     const centerY = 0
     const vertices = []
@@ -90,10 +90,10 @@ const scene = engine.scene.create({
       vertices.push(v)
     }
 
-    engine.physics.createBody(map, { x: 0, y: 0, type: 'static' })
+    engine.world.createBody(map, { x: 0, y: 0, type: 'static' })
 
     for (let i = 0; i < vertices.length; i++) {
-      engine.physics.addEdge(map, {
+      engine.world.addEdge(map, {
         ax: vertices[i].x,
         ay: vertices[i].y,
         bx: typeof vertices[i + 1] !== 'undefined' ? vertices[i + 1].x : vertices[0].x,
@@ -109,36 +109,36 @@ const scene = engine.scene.create({
       }
       const client = engine.network.clients[i]
       const inputs = client.inputs
-      const entity = engine.entities.cache[client.id]
-      const force = 5000 / 100
+      const entity = engine.world.entities[client.id]
+      const force = 10000 / 100
 
       inputs.forEach((inputs) => {
         if (inputs.keys.w && inputs.keys.w.hold === true) {
-          engine.physics.applyForce(entity, {
+          engine.world.applyForce(entity, {
             x: 0,
             y: -force * inputs.keys.w.delta / 1000
           })
         }
         if (inputs.keys.a && inputs.keys.a.hold === true) {
-          engine.physics.applyForce(entity, {
+          engine.world.applyForce(entity, {
             x: -force * inputs.keys.a.delta / 1000,
             y: 0
           })
         }
         if (inputs.keys.s && inputs.keys.s.hold === true) {
-          engine.physics.applyForce(entity, {
+          engine.world.applyForce(entity, {
             x: 0,
             y: force * inputs.keys.s.delta / 1000
           })
         }
         if (inputs.keys.d && inputs.keys.d.hold === true) {
-          engine.physics.applyForce(entity, {
+          engine.world.applyForce(entity, {
             x: force * inputs.keys.d.delta / 1000,
             y: 0
           })
         }
         if (inputs.keys[' '] && inputs.keys[' '].hold === true) {
-          engine.physics.applyTorque(entity, 500)
+          engine.world.applyTorque(entity, 500)
         }
       })
       client.inputs = []

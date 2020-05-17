@@ -1,14 +1,12 @@
-import Entities from './entities/entities-system'
+import World from './world/world'
 import Loop from './loop/loop'
-import Physics from './physics/physics-system'
-import Network from './network/network-system-server'
+import Server from './network/server'
 import Scene from './scene/scene-system'
 
 const SyncEngineServer = function (config) {
-  this.entities = new Entities()
+  this.world = new World(config.world)
   this.loop = new Loop(config.loop)
-  this.physics = new Physics(config.physics)
-  this.network = new Network(config.network, this)
+  this.network = new Server(config.network, this)
   this.scene = new Scene()
 
   this.loop.onStep = () => {
@@ -18,7 +16,7 @@ const SyncEngineServer = function (config) {
         this.scene.requestUpdate()
       }
       if (this.scene.mustUpdate) {
-        this.physics.update()
+        this.world.update()
         this.scene.current.update(this)
       }
     }

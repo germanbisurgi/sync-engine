@@ -1,4 +1,4 @@
-const Network = function (params, engine) {
+const Server = function (params, engine) {
   const config = Object.assign({
     ups: 30,
     socket: null
@@ -35,21 +35,21 @@ const Network = function (params, engine) {
   })
 }
 
-Network.prototype.onConnection = function () {}
+Server.prototype.onConnection = function () {}
 
-Network.prototype.onDisconnect = function () {}
+Server.prototype.onDisconnect = function () {}
 
-Network.prototype.serverUpdate = function () {
-  // const megabits = JSON.stringify(this.engine.entities.cache).split('').length * 16 * this.engine.network.ups / 1000000
+Server.prototype.serverUpdate = function () {
+  // const megabits = JSON.stringify(this.engine.world.entities).split('').length * 16 * this.engine.network.ups / 1000000
   // console.log('traffic in Mbps:', megabits)
   this.socket.emit('server-update', {
     timestamp: Date.now(),
-    entities: this.engine.entities.cache,
-    shapes: this.engine.physics.shapes
+    entities: this.engine.world.entities,
+    shapes: this.engine.world.physics.shapes
   })
 }
 
-Network.prototype.update = function (entities) {
+Server.prototype.update = function (entities) {
 }
 
-export default Network
+export default Server

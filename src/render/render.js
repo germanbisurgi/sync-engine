@@ -3,12 +3,21 @@ import Camera from './camera'
 const Render = function () {
   this.canvas = document.querySelector('#render-canvas')
   this.context = this.canvas.getContext('2d')
-  this.canvas.height = window.innerHeight
-  this.canvas.width = window.innerWidth
   this.camera = new Camera()
   this.imagesCache = {}
   this.shapes = []
   this.entities = {}
+
+  this.resize()
+
+  window.addEventListener('resize', this.resize.bind(this))
+}
+
+Render.prototype.resize = function () {
+  this.canvas.height = window.innerHeight
+  this.canvas.width = window.innerWidth
+  this.camera.w = this.canvas.width
+  this.camera.h = this.canvas.height
 }
 
 Render.prototype.getImage = function (image) {

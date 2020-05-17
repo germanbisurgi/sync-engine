@@ -10,8 +10,10 @@ const engine = new SyncEngineClient({
   loop: {
     fps: 60
   },
-  physics: {
-    debug: true
+  world: {
+    physics: {
+      debug: true
+    }
   }
 })
 const scene = engine.scene.create({
@@ -42,9 +44,9 @@ const scene = engine.scene.create({
   },
   update: (engine) => {
     // if player is connected
-    if (engine.entities.cache[engine.network.clientId]) {
+    if (engine.world.entities[engine.network.clientId]) {
       // camera follows entity owned by player
-      engine.render.camera.follow(engine.entities.cache[engine.network.clientId])
+      engine.render.camera.follow(engine.world.entities[engine.network.clientId])
 
       if (engine.inputs.getKey('8').hold === true) {
         engine.render.camera.z += 0.01
@@ -68,7 +70,7 @@ const scene = engine.scene.create({
     // const reconciliate = false
     //
     // if (interpolate) {
-    //   const entity = engine.entities.cache[engine.network.clientId]
+    //   const entity = engine.world.entities[engine.network.clientId]
     //
     //   if (engine.inputs.getKey('w').hold === true) {
     //     entity.y += -200 * engine.inputs.getKey('w').delta / 1000

@@ -1,4 +1,4 @@
-const Network = function (params) {
+const Client = function (params) {
   const config = Object.assign({
     socket: null,
     interpolationDelay: 100
@@ -22,7 +22,7 @@ const Network = function (params) {
   })
 }
 
-Network.prototype.processGameUpdate = function (data) {
+Client.prototype.processGameUpdate = function (data) {
   if (this.firstServerTimestamp === 0) {
     this.firstServerTimestamp = data.timestamp
     this.firstClientTimestamp = Date.now()
@@ -37,7 +37,7 @@ Network.prototype.processGameUpdate = function (data) {
   }
 }
 
-Network.prototype.getCurrentState = function () {
+Client.prototype.getCurrentState = function () {
   if (!this.firstServerTimestamp) {
     return {}
   }
@@ -86,15 +86,15 @@ Network.prototype.getCurrentState = function () {
   }
 }
 
-Network.prototype.interpolate = function (older, newer, ratio) {
+Client.prototype.interpolate = function (older, newer, ratio) {
   return older + (newer - older) * ratio
 }
 
-Network.prototype.currentServerTime = function () {
+Client.prototype.currentServerTime = function () {
   return this.firstServerTimestamp + (Date.now() - this.firstClientTimestamp) - this.interpolationDelay
 }
 
-Network.prototype.getBaseUpdate = function () {
+Client.prototype.getBaseUpdate = function () {
   const serverTime = this.currentServerTime()
   for (let i = this.serverUpdates.length - 1; i >= 0; i--) {
     if (this.serverUpdates[i].timestamp <= serverTime) {
@@ -104,15 +104,15 @@ Network.prototype.getBaseUpdate = function () {
   return -1
 }
 
-Network.prototype.getCurrentServerTimestamp = function (inputs) {
+Client.prototype.getCurrentServerTimestamp = function (inputs) {
   return this.firstServerTimestamp + (Date.now() - this.firstClientTimestamp) - this.interpolationDelay
 }
 
-Network.prototype.sendInputs = function (inputs) {
+Client.prototype.sendInputs = function (inputs) {
   this.socket.emit('client-inputs', {
     clientId: this.clientId,
     inputs: inputs
   })
 }
 
-export default Network
+export default Client

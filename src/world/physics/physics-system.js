@@ -20,6 +20,13 @@ const PhysicsSystem = function (params) {
 
 // ---------------------------------------------------------------------- bodies
 
+PhysicsSystem.prototype.destroyBody = function (entity) {
+  const body = this.getBody(entity.id)
+  this.world.DestroyBody(body)
+  delete this.bodies[entity.id]
+  delete this.shapes[entity.id]
+}
+
 PhysicsSystem.prototype.createBody = function (entity, params) {
   const config = Object.assign({
     x: 50,
@@ -183,7 +190,7 @@ PhysicsSystem.prototype.addEdge = function (entity, params) {
   body.CreateFixture(fixtureDef)
 }
 
-// --------------------------------------------------------------------- Getters
+// --------------------------------------------------------------------- getters
 
 PhysicsSystem.prototype.getPosition = function (entity) {
   const body = this.getBody(entity.id)
@@ -199,15 +206,19 @@ PhysicsSystem.prototype.getAngle = function (entity) {
   return body.GetAngle()
 }
 
-// --------------------------------------------------------------------- Setters
+PhysicsSystem.prototype.getLinearVelocity = function (entity) {
+  const body = this.getBody(entity.id)
+  const linearVelocity = body.GetLinearVelocity()
+  return {
+    x: linearVelocity.x * this.scale,
+    y: linearVelocity.y * this.scale
+  }
+}
+
+// ---------------------------------------------------------------------- forces
 
 PhysicsSystem.prototype.setGravity = function (config) {
   this.world.SetGravity(config)
-}
-
-PhysicsSystem.prototype.applyImpulse = function (entity, config) {
-  const body = this.getBody(entity.id)
-  body.ApplyImpulse(config, body.GetWorldCenter())
 }
 
 PhysicsSystem.prototype.applyForce = function (entity, config) {
@@ -221,5 +232,12 @@ PhysicsSystem.prototype.applyTorque = function (entity, torque) {
   body.SetAwake(true)
   body.ApplyTorque(torque / this.scale)
 }
+
+PhysicsSystem.prototype.applyImpulse = function (entity, config) {
+  const body = this.getBody(entity.id)
+  body.ApplyImpulse(config, body.GetWorldCenter())
+}
+
+// ---------------------------------------------------------------------- impulses
 
 export default PhysicsSystem
