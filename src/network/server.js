@@ -45,7 +45,7 @@ Server.prototype.serverUpdate = function () {
   this.socket.emit('server-update', {
     timestamp: Date.now(),
     entities: this.engine.world.entities,
-    shapes: this.engine.world.physics.shapes
+    shapes: this.engine.world.shapes
   })
 }
 

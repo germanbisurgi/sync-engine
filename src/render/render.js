@@ -120,18 +120,38 @@ Render.prototype.draw = function () {
   // console.log(this.shapes)
   this.shapes.forEach((shape) => {
     this.context.save()
-    this.context.lineWidth = '1'
-    this.context.strokeStyle = '#00ff00'
+    this.context.lineWidth = '2'
     switch (shape.type) {
-      case 'circle':
+      case 0:
+        this.context.strokeStyle = 'rgba(92, 233, 255, 1)'
+        this.context.fillStyle = 'rgba(92, 233, 255, 0.5)'
+        break
+      case 1:
+        this.context.strokeStyle = 'rgba(61, 255, 81, 1)'
+        this.context.fillStyle = 'rgba(61, 255, 81, 0.5)'
+        break
+      case 2:
+        this.context.strokeStyle = 'rgba(255, 192, 203, 1)'
+        this.context.fillStyle = 'rgba(255, 192, 203, 0.5)'
+    }
+
+    switch (shape.shape) {
+      case 0:
         this.context.beginPath()
         this.context.arc(shape.x, shape.y, shape.radius, 0, 2 * Math.PI)
         this.context.stroke()
+        this.context.fill()
         break
-      case 'edge':
+      case 1:
         this.context.beginPath()
         this.context.moveTo(shape.vertices[0].x, shape.vertices[0].y)
-        this.context.lineTo(shape.vertices[1].x, shape.vertices[1].y)
+        for (let i = 0; i < shape.vertices.length; i++) {
+          this.context.lineTo(shape.vertices[i].x, shape.vertices[i].y)
+        }
+        if (shape.vertices.length > 2) {
+          this.context.closePath()
+          this.context.fill()
+        }
         this.context.stroke()
     }
     this.context.restore()

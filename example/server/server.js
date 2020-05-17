@@ -32,10 +32,8 @@ const engine = new SyncEngineServer({
     fps: 60
   },
   world: {
-    physics: {
-      fps: 60,
-      debug: true
-    }
+    fps: 60,
+    debug: true
   }
 })
 
@@ -65,6 +63,10 @@ const scene = engine.scene.create({
       engine.world.destroyEntity(entity)
     }
 
+    const rectangle = engine.world.createEntity()
+    engine.world.createBody(rectangle, {})
+    engine.world.addRectangle(rectangle, {})
+
     // --------------------------------------------------------------------- map
 
     const width = 2400
@@ -90,7 +92,7 @@ const scene = engine.scene.create({
       vertices.push(v)
     }
 
-    engine.world.createBody(map, { x: 0, y: 0, type: 'static' })
+    engine.world.createBody(map, { x: 0, y: 0, type: 'kinematic' })
 
     for (let i = 0; i < vertices.length; i++) {
       engine.world.addEdge(map, {
