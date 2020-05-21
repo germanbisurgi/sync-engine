@@ -7,7 +7,6 @@ const Client = function (params) {
   this.interpolationDelay = config.interpolationDelay
   this.clientId = ''
   this.entities = {}
-  this.shapes = []
   this.serverUpdates = []
   this.firstServerTimestamp = 0
   this.firstClientTimestamp = 0
@@ -17,7 +16,6 @@ const Client = function (params) {
   })
 
   this.socket.on('server-update', (data) => {
-    this.shapes = data.shapes
     this.processGameUpdate(data)
   })
 }
@@ -79,7 +77,8 @@ Client.prototype.getCurrentState = function () {
         ax: newerEntity.ax,
         ay: newerEntity.ay,
         s: newerEntity.s,
-        v: newerEntity.v
+        v: newerEntity.v,
+        debug: newerEntity.debug
       }
     }
     return interpolated

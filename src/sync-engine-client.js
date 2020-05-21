@@ -35,7 +35,6 @@ const SyncEngineClient = function (config) {
         this.world.entities = this.network.getCurrentState()
         this.inputs.update()
         this.network.sendInputs(this.inputs.cache)
-        this.render.shapes = this.network.shapes
         this.render.update(this.world.entities)
         this.scene.current.update(this)
       }

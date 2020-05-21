@@ -34,7 +34,7 @@ const scene = engine.scene.create({
     engine.inputs.enableKey('2')
     engine.inputs.enableKey(' ')
     engine.inputs.enablePointer('0')
-    engine.render.camera.z = 0.5
+    engine.render.camera.z = 1
   },
   update: (engine) => {
     // if player is connected

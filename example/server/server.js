@@ -40,13 +40,16 @@ const engine = new SyncEngineServer({
 const scene = engine.scene.create({
   create: (engine) => {
     engine.network.onConnection = function (clientId) {
+      // ---------------------------------------------------------------- circle
+
       const entity = engine.world.createEntity({
         id: clientId,
-        angle: 0,
-        image: 'token'
+        image: 'token',
+        w: 50,
+        h: 50
       })
 
-      engine.world.createBody(entity, {})
+      engine.world.createBody(entity)
 
       engine.world.addCircle(entity, {
         radius: 25
@@ -58,24 +61,29 @@ const scene = engine.scene.create({
       engine.world.destroyEntity(entity)
     }
 
-    // const rectangle = engine.world.createEntity()
-    // engine.world.createBody(rectangle, {})
-    // engine.world.addRectangle(rectangle, {})
+    // ----------------------------------------------------------------- polygon
 
-    // --------------------------------------------------------------------- map
-
-    const width = 2400
-    const height = 1600
-
-    const map = engine.world.createEntity({
-      image: 'arena',
-      w: width,
-      h: height
+    const polygon = engine.world.createEntity()
+    engine.world.createBody(polygon)
+    engine.world.addPolygon(polygon, {
+      vertices: [
+        { x: 0, y: -40 },
+        { x: 50, y: 50 },
+        { x: -50, y: 50 }
+      ]
     })
 
-    const size = 720
-    const sides = 50
-    const centerX = -10
+    // --------------------------------------------------------------- rectangle
+
+    const rectangle = engine.world.createEntity()
+    engine.world.createBody(rectangle)
+    engine.world.addRectangle(rectangle)
+
+    // ------------------------------------------------------------------- edges
+
+    const size = 300
+    const sides = 6
+    const centerX = 0
     const centerY = 0
     const vertices = []
 
@@ -87,25 +95,11 @@ const scene = engine.scene.create({
       vertices.push(v)
     }
 
-    engine.world.createBody(map, { x: 0, y: 0, type: 'kinematic' })
+    const map = engine.world.createEntity()
 
-    for (let i = 0; i < vertices.length; i++) {
-      engine.world.addEdge(map, {
-        ax: vertices[i].x,
-        ay: vertices[i].y,
-        bx: typeof vertices[i + 1] !== 'undefined' ? vertices[i + 1].x : vertices[0].x,
-        by: typeof vertices[i + 1] !== 'undefined' ? vertices[i + 1].y : vertices[0].y
-      })
-    }
-
-    const ball = engine.world.createEntity({
-      image: 'ball'
-    })
-
-    engine.world.createBody(ball, {})
-
-    engine.world.addCircle(ball, {
-      radius: 25
+    engine.world.createBody(map, { type: 'kinematic' })
+    engine.world.addEdges(map, {
+      vertices: vertices // todo: at least 2 vertices
     })
   },
   update: (engine) => {

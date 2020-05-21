@@ -5,7 +5,6 @@ const Render = function () {
   this.context = this.canvas.getContext('2d')
   this.camera = new Camera()
   this.imagesCache = {}
-  this.shapes = []
   this.entities = {}
 
   this.resize()
@@ -52,8 +51,8 @@ Render.prototype.draw = function () {
   // scale
   this.context.scale(this.camera.z, this.camera.z)
 
-  this.context.strokeStyle = 'red'
-  this.context.lineWidth = '3'
+  this.context.strokeStyle = 'yellow'
+  this.context.lineWidth = '2'
   this.context.beginPath()
   this.context.arc(0, 0, 50, 0, 2 * Math.PI)
   this.context.stroke()
@@ -74,7 +73,7 @@ Render.prototype.draw = function () {
     if (Object.prototype.hasOwnProperty.call(this.entities, i)) {
       const entity = this.entities[i]
 
-      if (!entity.v || !entity.image) {
+      if (!entity.v) {
         continue
       }
 
@@ -91,70 +90,123 @@ Render.prototype.draw = function () {
         entity.s
       )
 
-      const image = this.getImage(entity.image)
+      if (entity.image) {
+        const image = this.getImage(entity.image)
 
-      if (entity.sw === 0) {
-        entity.sw = image.width
+        if (entity.w === 0) {
+          entity.w = image.width
+        }
+
+        if (entity.h === 0) {
+          entity.h = image.height
+        }
+
+        if (entity.sw === 0) {
+          entity.sw = image.width
+        }
+
+        if (entity.sh === 0) {
+          entity.sh = image.height
+        }
+
+        this.context.drawImage(
+          image,
+          entity.sx,
+          entity.sy,
+          entity.sw,
+          entity.sh,
+          entity.w * -0.5, // do not touch this
+          entity.h * -0.5, // do not touch this
+          entity.w, // do not touch this
+          entity.h // do not touch this
+        )
       }
 
-      if (entity.sh === 0) {
-        entity.sh = image.height
-      }
-
-      this.context.drawImage(
-        image,
-        entity.sx,
-        entity.sy,
-        entity.sw,
-        entity.sh,
-        entity.w * -0.5, // do not touch this
-        entity.h * -0.5, // do not touch this
-        entity.w, // do not touch this
-        entity.h // do not touch this
-      )
       this.context.restore()
+
+      switch (entity.debug.shape) {
+        case 'circle':
+          this.context.save()
+          this.context.strokeStyle = 'cyan'
+          this.context.lineWidth = '2'
+          this.context.translate(
+            entity.x,
+            entity.y
+          )
+          this.context.rotate(entity.a)
+          this.context.beginPath()
+          this.context.arc(0, 0, entity.debug.radius, 0, 2 * Math.PI)
+          this.context.stroke()
+          this.context.moveTo(0, 0)
+          this.context.lineTo(entity.debug.radius, 0)
+          this.context.stroke()
+          this.context.restore()
+          break
+        case 'rectangle':
+          this.context.save()
+          this.context.strokeStyle = 'cyan'
+          this.context.lineWidth = '2'
+          this.context.translate(
+            entity.x,
+            entity.y
+          )
+          this.context.rotate(entity.a)
+          this.context.beginPath()
+          this.context.rect(entity.debug.w * -0.5, entity.debug.h * -0.5, entity.debug.w, entity.debug.h)
+          this.context.stroke()
+          this.context.restore()
+          break
+        case 'edges':
+          this.context.save()
+          this.context.strokeStyle = 'cyan'
+          this.context.lineWidth = '2'
+          this.context.translate(
+            entity.x,
+            entity.y
+          )
+          this.context.rotate(entity.a)
+          this.context.beginPath()
+          this.context.moveTo(
+            entity.debug.vertices[0].x,
+            entity.debug.vertices[0].y
+          )
+          for (let i = 0; i < entity.debug.vertices.length; i++) {
+            this.context.lineTo(
+              entity.debug.vertices[i].x,
+              entity.debug.vertices[i].y
+            )
+          }
+          this.context.stroke()
+          this.context.restore()
+          break
+        case 'polygon':
+          this.context.save()
+          this.context.strokeStyle = 'cyan'
+          this.context.lineWidth = '2'
+          this.context.translate(
+            entity.x,
+            entity.y
+          )
+          this.context.rotate(entity.a)
+          this.context.beginPath()
+          this.context.moveTo(
+            entity.debug.vertices[0].x,
+            entity.debug.vertices[0].y
+          )
+          for (let i = 0; i < entity.debug.vertices.length; i++) {
+            this.context.lineTo(
+              entity.debug.vertices[i].x,
+              entity.debug.vertices[i].y
+            )
+          }
+          if (entity.debug.vertices.length > 2) {
+            this.context.closePath()
+          }
+          this.context.stroke()
+          this.context.restore()
+      }
     }
   }
-
-  // console.log(this.shapes)
-  this.shapes.forEach((shape) => {
-    this.context.save()
-    this.context.lineWidth = '2'
-    switch (shape.type) {
-      case 0:
-        this.context.strokeStyle = 'rgba(92, 233, 255, 1)'
-        this.context.fillStyle = 'rgba(92, 233, 255, 0.5)'
-        break
-      case 1:
-        this.context.strokeStyle = 'rgba(61, 255, 81, 1)'
-        this.context.fillStyle = 'rgba(61, 255, 81, 0.5)'
-        break
-      case 2:
-        this.context.strokeStyle = 'rgba(255, 192, 203, 1)'
-        this.context.fillStyle = 'rgba(255, 192, 203, 0.5)'
-    }
-
-    switch (shape.shape) {
-      case 0:
-        this.context.beginPath()
-        this.context.arc(shape.x, shape.y, shape.radius, 0, 2 * Math.PI)
-        this.context.stroke()
-        this.context.fill()
-        break
-      case 1:
-        this.context.beginPath()
-        this.context.moveTo(shape.vertices[0].x, shape.vertices[0].y)
-        for (let i = 0; i < shape.vertices.length; i++) {
-          this.context.lineTo(shape.vertices[i].x, shape.vertices[i].y)
-        }
-        if (shape.vertices.length > 2) {
-          this.context.closePath()
-          this.context.fill()
-        }
-        this.context.stroke()
-    }
-    this.context.restore()
-  })
   this.context.restore()
 }
 

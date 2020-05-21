@@ -44,8 +44,7 @@ Server.prototype.serverUpdate = function () {
   // console.log('traffic in Mbps:', megabits)
   this.socket.emit('server-update', {
     timestamp: Date.now(),
-    entities: this.engine.world.entities,
-    shapes: this.engine.world.shapes
+    entities: this.engine.world.entities
   })
 }
 
