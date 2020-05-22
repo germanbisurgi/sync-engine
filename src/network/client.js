@@ -20,6 +20,12 @@ const Client = function (params) {
   })
 }
 
+Client.prototype.on = function (name, callback) {
+  this.socket.on(name, (data) => {
+    callback(data)
+  })
+}
+
 Client.prototype.processGameUpdate = function (data) {
   if (this.firstServerTimestamp === 0) {
     this.firstServerTimestamp = data.timestamp
@@ -64,6 +70,7 @@ Client.prototype.getCurrentState = function () {
       const newerEntity = typeof next.entities[i] !== 'undefined' ? next.entities[i] : olderEntity
       interpolated[i] = {
         id: newerEntity.id,
+        tags: newerEntity.tags,
         x: this.interpolate(olderEntity.x, newerEntity.x, r),
         y: this.interpolate(olderEntity.y, newerEntity.y, r),
         a: this.interpolate(olderEntity.a, newerEntity.a, r),
@@ -78,7 +85,8 @@ Client.prototype.getCurrentState = function () {
         ay: newerEntity.ay,
         s: newerEntity.s,
         v: newerEntity.v,
-        debug: newerEntity.debug
+        debug: newerEntity.debug,
+        contacts: newerEntity.contacts
       }
     }
     return interpolated

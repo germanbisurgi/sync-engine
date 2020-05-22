@@ -4,6 +4,7 @@ import Entity from './entity'
 const World = function (params) {
   const B2World = Box2D.Dynamics.b2World
   const B2Vec2 = Box2D.Common.Math.b2Vec2
+  const B2ContactListener = Box2D.Dynamics.b2ContactListener
 
   const config = Object.assign({
     fps: 60,
@@ -11,12 +12,62 @@ const World = function (params) {
     debug: false
   }, params)
 
+  this.frame = 0
   this.fps = config.fps
   this.scale = config.scale
   this.debug = config.debug
+  this.entities = {}
   this.bodies = {}
   this.world = new B2World(new B2Vec2(0, 0), true)
-  this.entities = {}
+  this.contacts = new B2ContactListener()
+
+  this.world.SetContactListener(this.contacts)
+
+  this.contacts.BeginContact = (contact) => {
+    this.onBeginContact(contact)
+  }
+
+  this.contacts.EndContact = (contact) => {
+    this.onEndContact(contact)
+  }
+
+  this.contacts.PreSolve = (contact) => {
+    this.onPreSolve(contact)
+  }
+
+  this.contacts.PostSolve = (contact) => {
+    this.onPostSolve(contact)
+  }
+}
+
+// ------------------------------------------------------------------ contacts
+
+World.prototype.onBeginContact = function (contact) {}
+
+World.prototype.onEndContact = function (contact) {}
+
+World.prototype.onPreSolve = function (contact) {}
+
+World.prototype.onPostSolve = function (contact) {}
+
+// ---------------------------------------------------------------------- update
+
+World.prototype.update = function () {
+  this.frame++
+  this.world.Step(1 / this.fps, 8, 3)
+  this.world.ClearForces()
+  for (const i in this.bodies) {
+    if (!Object.prototype.hasOwnProperty.call(this.bodies, i)) {
+      continue
+    }
+
+    // update positions
+    const body = this.bodies[i]
+    const entity = body.GetUserData()
+    entity.x = this.getPosition(entity).x
+    entity.y = this.getPosition(entity).y
+    entity.a = this.getAngle(entity)
+  }
 }
 
 // -------------------------------------------------------------------- entities
@@ -110,23 +161,6 @@ World.prototype.createBody = function (entity, params) {
   return body
 }
 
-World.prototype.update = function () {
-  this.world.Step(1 / this.fps, 8, 3)
-  this.world.ClearForces()
-  for (const i in this.bodies) {
-    if (!Object.prototype.hasOwnProperty.call(this.bodies, i)) {
-      continue
-    }
-    const body = this.bodies[i]
-    const entity = body.GetUserData()
-    const position = this.getPosition(entity)
-    const angle = this.getAngle(entity)
-    entity.x = position.x
-    entity.y = position.y
-    entity.a = angle
-  }
-}
-
 World.prototype.getBody = function (entityId) {
   return this.bodies[entityId]
 }
@@ -142,6 +176,39 @@ World.prototype.getFixtureDef = function (config) {
   fixDef.isSensor = config.isSensor
   return fixDef
 }
+
+// ---------------------------------------------------------------------- circle
+
+World.prototype.addCircle = function (entity, params) {
+  const config = Object.assign({
+    x: 0,
+    y: 0,
+    radius: 25,
+    density: 1,
+    friction: 0.5,
+    restitution: 0.5,
+    isSensor: false
+  }, params)
+  const fixtureDefinition = this.getFixtureDef(config)
+  const B2CircleShape = Box2D.Collision.Shapes.b2CircleShape
+  const fixtureDef = fixtureDefinition
+  fixtureDef.shape = new B2CircleShape(config.radius / this.scale)
+  fixtureDef.shape.m_p = {
+    x: config.x / this.scale,
+    y: config.y / this.scale
+  }
+  const body = this.getBody(entity.id)
+  body.CreateFixture(fixtureDef)
+
+  if (this.debug) {
+    entity.debug = {
+      shape: 'circle',
+      radius: config.radius
+    }
+  }
+}
+
+// ------------------------------------------------------------------- rectangle
 
 World.prototype.addRectangle = function (entity, params) {
   const config = Object.assign({
@@ -181,34 +248,7 @@ World.prototype.addRectangle = function (entity, params) {
   }
 }
 
-World.prototype.addCircle = function (entity, params) {
-  const config = Object.assign({
-    x: 0,
-    y: 0,
-    radius: 25,
-    density: 1,
-    friction: 0.5,
-    restitution: 0.5,
-    isSensor: false
-  }, params)
-  const fixtureDefinition = this.getFixtureDef(config)
-  const B2CircleShape = Box2D.Collision.Shapes.b2CircleShape
-  const fixtureDef = fixtureDefinition
-  fixtureDef.shape = new B2CircleShape(config.radius / this.scale)
-  fixtureDef.shape.m_p = {
-    x: config.x / this.scale,
-    y: config.y / this.scale
-  }
-  const body = this.getBody(entity.id)
-  body.CreateFixture(fixtureDef)
-
-  if (this.debug) {
-    entity.debug = {
-      shape: 'circle',
-      radius: config.radius
-    }
-  }
-}
+// ----------------------------------------------------------------------- edges
 
 World.prototype.addEdges = function (entity, params) {
   const config = Object.assign({
@@ -243,6 +283,8 @@ World.prototype.addEdges = function (entity, params) {
     }
   }
 }
+
+// --------------------------------------------------------------------- polygon
 
 World.prototype.addPolygon = function (entity, params) {
   const config = Object.assign({
@@ -288,50 +330,91 @@ World.prototype.addPolygon = function (entity, params) {
 
 World.prototype.getPosition = function (entity) {
   const body = this.getBody(entity.id)
-  const position = body.GetPosition()
-  return {
-    x: position.x * this.scale,
-    y: position.y * this.scale
+  if (body) {
+    const position = body.GetPosition()
+    return {
+      x: position.x * this.scale,
+      y: position.y * this.scale
+    }
   }
 }
 
 World.prototype.getAngle = function (entity) {
   const body = this.getBody(entity.id)
-  return body.GetAngle()
+  if (body) {
+    return body.GetAngle()
+  }
 }
 
 World.prototype.getLinearVelocity = function (entity) {
   const body = this.getBody(entity.id)
-  const linearVelocity = body.GetLinearVelocity()
-  return {
-    x: linearVelocity.x * this.scale,
-    y: linearVelocity.y * this.scale
+  if (body) {
+    const linearVelocity = body.GetLinearVelocity()
+    return {
+      x: linearVelocity.x * this.scale,
+      y: linearVelocity.y * this.scale
+    }
   }
 }
 
-// ---------------------------------------------------------------------- forces
+// --------------------------------------------------------------------- setters
 
 World.prototype.setGravity = function (config) {
   this.world.SetGravity(config)
 }
 
+World.prototype.setPosition = function (entity, config) {
+  const body = this.getBody(entity.id)
+  if (body) {
+    body.SetPosition({
+      x: config.x / this.scale,
+      y: config.y / this.scale
+    })
+  }
+}
+
+World.prototype.setAngularVelocity = function (entity, omega) {
+  const body = this.getBody(entity.id)
+  if (body) {
+    body.SetAngularVelocity(omega)
+  }
+}
+
+World.prototype.setLinearVelocity = function (entity, config) {
+  const body = this.getBody(entity.id)
+  if (body) {
+    body.SetLinearVelocity({
+      x: config.x / this.scale,
+      y: config.y / this.scale
+    })
+  }
+}
+
+// ---------------------------------------------------------------------- forces
+
 World.prototype.applyForce = function (entity, config) {
   const body = this.getBody(entity.id)
-  body.ApplyForce(config, body.GetWorldCenter())
+  if (body) {
+    body.ApplyForce(config, body.GetWorldCenter())
+  }
 }
 
 World.prototype.applyTorque = function (entity, torque) {
   const body = this.getBody(entity.id)
-  body.SetActive(true)
-  body.SetAwake(true)
-  body.ApplyTorque(torque / this.scale)
+  if (body) {
+    body.SetActive(true)
+    body.SetAwake(true)
+    body.ApplyTorque(torque / this.scale)
+  }
 }
 
 // -------------------------------------------------------------------- impulses
 
 World.prototype.applyImpulse = function (entity, config) {
   const body = this.getBody(entity.id)
-  body.ApplyImpulse(config, body.GetWorldCenter())
+  if (body) {
+    body.ApplyImpulse(config, body.GetWorldCenter())
+  }
 }
 
 export default World

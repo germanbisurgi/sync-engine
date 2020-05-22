@@ -21,6 +21,7 @@ const scene = engine.scene.create({
     engine.loader.loadImage({ name: 'token', url: './token.png' })
     engine.loader.loadImage({ name: 'arena', url: './arena.jpg' })
     engine.loader.loadImage({ name: 'ball', url: './ball.png' })
+    engine.loader.loadAudio({ name: 'wilhelmscream', url: './wilhelmscream.mp3' })
   },
   create: (engine) => {
     engine.inputs.enableKey('w')
@@ -35,11 +36,16 @@ const scene = engine.scene.create({
     engine.inputs.enableKey(' ')
     engine.inputs.enablePointer('0')
     engine.render.camera.z = 1
+
+    engine.network.on('out', (data) => {
+      engine.audio.play('wilhelmscream')
+    })
   },
   update: (engine) => {
     // engine.render.fullScreen()
 
     // document.querySelector('#debug').innerHTML = JSON.stringify(engine.inputs.cache, null, 2)
+    // document.querySelector('#debug').innerHTML = JSON.stringify(engine.world.entities[engine.network.clientId], null, 2)
 
     // if player is connected
     if (engine.world.entities[engine.network.clientId]) {

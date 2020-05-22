@@ -35,6 +35,10 @@ const Server = function (params, engine) {
   })
 }
 
+Server.prototype.emit = function (name, message) {
+  this.socket.emit(name, message)
+}
+
 Server.prototype.onConnection = function () {}
 
 Server.prototype.onDisconnect = function () {}

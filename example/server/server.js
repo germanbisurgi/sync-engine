@@ -44,12 +44,16 @@ const scene = engine.scene.create({
 
       const entity = engine.world.createEntity({
         id: clientId,
+        tags: ['player'],
         image: 'token',
         w: 50,
         h: 50
       })
 
-      engine.world.createBody(entity)
+      engine.world.createBody(entity, {
+        x: 150 * Math.cos(Math.random() * Math.PI * 2),
+        y: 150 * Math.sin(Math.random() * Math.PI * 2)
+      })
 
       engine.world.addCircle(entity, {
         radius: 25
@@ -63,25 +67,40 @@ const scene = engine.scene.create({
 
     // ----------------------------------------------------------------- polygon
 
-    const polygon = engine.world.createEntity()
-    engine.world.createBody(polygon)
-    engine.world.addPolygon(polygon, {
-      vertices: [
-        { x: 0, y: -40 },
-        { x: 50, y: 50 },
-        { x: -50, y: 50 }
-      ]
-    })
+    for (let i = 0; i < 10; i++) {
+      const polygon = engine.world.createEntity()
+      engine.world.createBody(polygon, {
+        x: 300 * Math.cos(Math.random() * Math.PI * 2),
+        y: 300 * Math.sin(Math.random() * Math.PI * 2)
+      })
+      engine.world.addPolygon(polygon, {
+        vertices: [
+          { x: 0, y: -10 },
+          { x: 15, y: 15 },
+          { x: -15, y: 15 }
+        ],
+        restitution: 1.1
+      })
+    }
 
     // --------------------------------------------------------------- rectangle
 
-    const rectangle = engine.world.createEntity()
-    engine.world.createBody(rectangle)
-    engine.world.addRectangle(rectangle)
+    for (let i = 0; i < 10; i++) {
+      const rectangle = engine.world.createEntity()
+      engine.world.createBody(rectangle, {
+        x: 150 * Math.cos(Math.random() * Math.PI * 2),
+        y: 150 * Math.sin(Math.random() * Math.PI * 2)
+      })
+      engine.world.addRectangle(rectangle, {
+        height: 25,
+        width: 25,
+        restitution: 1.1
+      })
+    }
 
     // ------------------------------------------------------------------- edges
 
-    const size = 400
+    const size = 1000
     const sides = 6
     const centerX = 0
     const centerY = 0
@@ -101,6 +120,42 @@ const scene = engine.scene.create({
     engine.world.addEdges(map, {
       vertices: vertices // todo: at least 2 vertices
     })
+
+    // -------------------------------------------------------------------- ring
+
+    const ring = engine.world.createEntity({
+      tags: ['ring']
+    })
+    engine.world.createBody(ring)
+
+    engine.world.addCircle(ring, {
+      radius: 500,
+      isSensor: true
+    })
+
+    // ------------------------------------------------------------------ events
+
+    engine.world.onEndContact = function (contact) {
+      const entityA = contact.GetFixtureA().GetBody().GetUserData()
+      const entityB = contact.GetFixtureB().GetBody().GetUserData()
+      if (entityA.tags.includes('player') && entityB.tags.includes('ring')) {
+        engine.network.emit('out')
+        setTimeout(() => {
+          engine.world.setAngularVelocity(entityA, 0)
+          engine.world.setLinearVelocity(entityA, { x: 0, y: 0 })
+          engine.world.setPosition(entityA, { x: 0, y: 0 })
+        }, 1000)
+      }
+
+      if (entityB.tags.includes('player') && entityA.tags.includes('ring')) {
+        engine.network.emit('out')
+        setTimeout(() => {
+          engine.world.setAngularVelocity(entityB, 0)
+          engine.world.setLinearVelocity(entityB, { x: 0, y: 0 })
+          engine.world.setPosition(entityB, { x: 0, y: 0 })
+        }, 1000)
+      }
+    }
   },
   update: (engine) => {
     // physics update

@@ -1,6 +1,7 @@
 const Entity = function (params) {
   const config = Object.assign({
     id: '',
+    tags: [],
     x: 0,
     y: 0,
     a: 0,
@@ -16,11 +17,16 @@ const Entity = function (params) {
     s: 1,
     v: true,
     debug: {}
+    // contacts: {
+    //   begin: {},
+    //   end: {},
+    //   preSolve: {},
+    //   postSolve: {}
+    // }
   }, params)
 
-  // todo: bodyId
-
   this.id = config.id
+  this.tags = config.tags
   this.x = config.x
   this.y = config.y
   this.a = config.a
@@ -36,6 +42,7 @@ const Entity = function (params) {
   this.s = config.s
   this.v = config.v
   this.debug = config.debug
+  this.contacts = config.contacts
 }
 
 export default Entity
