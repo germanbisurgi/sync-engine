@@ -81,7 +81,7 @@ const scene = engine.scene.create({
 
     // ------------------------------------------------------------------- edges
 
-    const size = 300
+    const size = 400
     const sides = 6
     const centerX = 0
     const centerY = 0
@@ -114,6 +114,19 @@ const scene = engine.scene.create({
       const force = 10000 / 100
 
       inputs.forEach((inputs) => {
+        if (inputs.deviceMotions && inputs.deviceMotions.x && Math.round(inputs.deviceMotions.x) !== 0) {
+          engine.world.applyForce(entity, {
+            x: 0,
+            y: inputs.deviceMotions.x / 2
+          })
+        }
+        if (inputs.deviceMotions && inputs.deviceMotions.y && Math.round(inputs.deviceMotions.y) !== 0) {
+          engine.world.applyForce(entity, {
+            x: inputs.deviceMotions.y / 2,
+            y: 0
+          })
+        }
+
         if (inputs.keys.w && inputs.keys.w.hold === true) {
           engine.world.applyForce(entity, {
             x: 0,

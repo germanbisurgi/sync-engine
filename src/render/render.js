@@ -8,6 +8,7 @@ const Render = function () {
   this.entities = {}
 
   this.resize()
+  // this.fullScreen()
 
   window.addEventListener('resize', this.resize.bind(this))
 }
@@ -17,6 +18,19 @@ Render.prototype.resize = function () {
   this.canvas.width = window.innerWidth
   this.camera.w = this.canvas.width
   this.camera.h = this.canvas.height
+}
+
+Render.prototype.fullScreen = function () {
+  // this.canvas.requestFullscreen()
+  if (this.canvas.requestFullscreen) {
+    this.canvas.requestFullscreen()
+  } else if (this.canvas.mozRequestFullScreen) { /* Firefox */
+    this.canvas.mozRequestFullScreen()
+  } else if (this.canvas.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
+    this.canvas.webkitRequestFullscreen()
+  } else if (this.canvas.msRequestFullscreen) { /* IE/Edge */
+    this.canvas.msRequestFullscreen()
+  }
 }
 
 Render.prototype.getImage = function (image) {

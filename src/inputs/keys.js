@@ -1,6 +1,6 @@
 import Key from './key'
 
-const KeySystem = function () {
+const Keys = function () {
   this.enabled = true
   this.cache = {}
   this.delta = 0
@@ -11,30 +11,30 @@ const KeySystem = function () {
   document.addEventListener('keyup', this.handleKeyUp.bind(this), false)
 }
 
-KeySystem.prototype.handleKeyDown = function (event) {
+Keys.prototype.handleKeyDown = function (event) {
   if (typeof this.cache[event.key] !== 'undefined') {
     this.cache[event.key].hold = true
   }
 }
 
-KeySystem.prototype.handleKeyUp = function (event) {
+Keys.prototype.handleKeyUp = function (event) {
   if (typeof this.cache[event.key] !== 'undefined') {
     this.cache[event.key].hold = false
   }
 }
 
-KeySystem.prototype.enable = function (key) {
+Keys.prototype.enable = function (key) {
   if (typeof this.cache[key] === 'undefined') {
     this.cache[key] = new Key(key)
   }
   return this.cache[key]
 }
 
-KeySystem.prototype.get = function (key) {
+Keys.prototype.get = function (key) {
   return this.cache[key]
 }
 
-KeySystem.prototype.update = function () {
+Keys.prototype.update = function () {
   if (this.enabled) {
     this.frame++
     this.now = window.performance.now()
@@ -65,8 +65,8 @@ KeySystem.prototype.update = function () {
   }
 }
 
-KeySystem.prototype.destroy = function () {
+Keys.prototype.destroy = function () {
   this.cache = {}
 }
 
-export default KeySystem
+export default Keys

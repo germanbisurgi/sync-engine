@@ -6,6 +6,7 @@
 }
 
 body {
+  background : #000;
   width: 100vw;
   height: 100vh;
   position: relative;
@@ -64,5 +65,14 @@ button {
   content: '%';
 }
 
-
+#debug {
+  background: #000;
+  color: #00ff00;
+  opacity: 0.3;
+  height: 100%;
+  width: 100%;
+  overflow: auto;
+  position: absolute;
+  z-index: 3;
+}
 

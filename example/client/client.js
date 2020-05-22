@@ -5,7 +5,7 @@ const socket = io()
 const engine = new SyncEngineClient({
   network: {
     socket: socket,
-    interpolationDelay: 0
+    interpolationDelay: 100
   },
   loop: {
     fps: 60
@@ -37,6 +37,10 @@ const scene = engine.scene.create({
     engine.render.camera.z = 1
   },
   update: (engine) => {
+    // engine.render.fullScreen()
+
+    // document.querySelector('#debug').innerHTML = JSON.stringify(engine.inputs.cache, null, 2)
+
     // if player is connected
     if (engine.world.entities[engine.network.clientId]) {
       // camera follows entity owned by player

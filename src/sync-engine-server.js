@@ -1,11 +1,13 @@
-import World from './world/world'
 import Loop from './loop/loop'
+import Mathematics from './mathematics/mathematics'
 import Server from './network/server'
 import Scene from './scene/scene-system'
+import World from './world/world'
 
 const SyncEngineServer = function (config) {
   this.world = new World(config.world)
   this.loop = new Loop(config.loop)
+  this.mathematics = new Mathematics()
   this.network = new Server(config.network, this)
   this.scene = new Scene()
 

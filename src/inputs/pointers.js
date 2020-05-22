@@ -1,6 +1,6 @@
 import Pointer from './pointer'
 
-const PointerSystem = function () {
+const Pointers = function () {
   this.enabled = true
   this.cache = {}
   this.delta = 0
@@ -11,18 +11,18 @@ const PointerSystem = function () {
   this.enablePointers()
 }
 
-PointerSystem.prototype.enable = function (pointer) {
+Pointers.prototype.enable = function (pointer) {
   if (typeof this.cache[pointer] === 'undefined') {
     this.cache[pointer] = new Pointer(pointer)
   }
   return this.cache[pointer]
 }
 
-PointerSystem.prototype.get = function (pointer) {
+Pointers.prototype.get = function (pointer) {
   return this.cache[pointer]
 }
 
-PointerSystem.prototype.enablePointers = function () {
+Pointers.prototype.enablePointers = function () {
   this.canvas.style.touchAction = 'none' // needed for mobile
   this.canvas.style.userSelect = 'none' // needed for mobile
   this.canvas.addEventListener('pointerdown', this.handlePointerDown.bind(this), false)
@@ -33,7 +33,7 @@ PointerSystem.prototype.enablePointers = function () {
   window.addEventListener('contextmenu', this.handleContextMenu.bind(this), false)
 }
 
-PointerSystem.prototype.getPointerByID = function (id) {
+Pointers.prototype.getPointerByID = function (id) {
   let output = false
   for (const i in this.cache) {
     if (Object.hasOwnProperty.call(this.cache, i)) {
@@ -46,7 +46,7 @@ PointerSystem.prototype.getPointerByID = function (id) {
   return output
 }
 
-PointerSystem.prototype.getInactivePointer = function () {
+Pointers.prototype.getInactivePointer = function () {
   let output = false
   for (const i in this.cache) {
     if (Object.hasOwnProperty.call(this.cache, i)) {
@@ -59,7 +59,7 @@ PointerSystem.prototype.getInactivePointer = function () {
   return output
 }
 
-PointerSystem.prototype.handlePointerDown = function (event) {
+Pointers.prototype.handlePointerDown = function (event) {
   event.preventDefault()
   const pointer = this.getPointerByID(event.pointerId) || this.getInactivePointer()
   if (pointer) {
@@ -74,7 +74,7 @@ PointerSystem.prototype.handlePointerDown = function (event) {
   }
 }
 
-PointerSystem.prototype.handlePointerMove = function (event) {
+Pointers.prototype.handlePointerMove = function (event) {
   event.preventDefault()
   const pointer = this.getPointerByID(event.pointerId) || this.getInactivePointer()
   if (pointer) {
@@ -84,7 +84,7 @@ PointerSystem.prototype.handlePointerMove = function (event) {
   }
 }
 
-PointerSystem.prototype.handlePointerUpAndCancel = function (event) {
+Pointers.prototype.handlePointerUpAndCancel = function (event) {
   event.preventDefault()
   const pointer = this.getPointerByID(event.pointerId)
   if (pointer) {
@@ -93,13 +93,13 @@ PointerSystem.prototype.handlePointerUpAndCancel = function (event) {
   }
 }
 
-PointerSystem.prototype.handleContextMenu = function (event) {
+Pointers.prototype.handleContextMenu = function (event) {
   event.preventDefault()
   event.stopPropagation()
   return false
 }
 
-PointerSystem.prototype.update = function () {
+Pointers.prototype.update = function () {
   if (this.enabled) {
     this.frame++
     this.now = window.performance.now()
@@ -133,8 +133,8 @@ PointerSystem.prototype.update = function () {
   }
 }
 
-PointerSystem.prototype.destroy = function () {
+Pointers.prototype.destroy = function () {
   this.cache = {}
 }
 
-export default PointerSystem
+export default Pointers

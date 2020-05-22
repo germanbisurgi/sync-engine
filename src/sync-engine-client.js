@@ -1,7 +1,8 @@
 import World from './world/world'
 import Loader from './loader/loader'
 import Loop from './loop/loop'
-import Inputs from './inputs/inputs-client'
+import Inputs from './inputs/inputs'
+import Mathematics from './mathematics/mathematics'
 import Client from './network/client'
 import Render from './render/render'
 import Scene from './scene/scene-system'
@@ -11,6 +12,7 @@ const SyncEngineClient = function (config) {
   this.loader = new Loader()
   this.loop = new Loop(config.loop)
   this.inputs = new Inputs()
+  this.mathematics = new Mathematics()
   this.network = new Client(config.network)
   this.render = new Render()
   this.scene = new Scene()
