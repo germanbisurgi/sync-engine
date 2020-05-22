@@ -39,13 +39,15 @@ const engine = new SyncEngineServer({
 
 const scene = engine.scene.create({
   create: (engine) => {
+    const deaths = {}
+
     engine.network.onConnection = function (clientId) {
       // ---------------------------------------------------------------- circle
 
       const entity = engine.world.createEntity({
         id: clientId,
         tags: ['player'],
-        image: 'token',
+        // image: 'token',
         w: 50,
         h: 50
       })
@@ -58,20 +60,27 @@ const scene = engine.scene.create({
       engine.world.addCircle(entity, {
         radius: 25
       })
+
+      deaths[clientId] = 0
     }
 
     engine.network.onDisconnect = function (clientId) {
       const entity = engine.world.getEntity(clientId)
       engine.world.destroyEntity(entity)
+      delete deaths[clientId]
     }
 
     // ----------------------------------------------------------------- polygon
 
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 5; i++) {
       const polygon = engine.world.createEntity()
       engine.world.createBody(polygon, {
         x: 300 * Math.cos(Math.random() * Math.PI * 2),
-        y: 300 * Math.sin(Math.random() * Math.PI * 2)
+        y: 300 * Math.sin(Math.random() * Math.PI * 2),
+        linearVelocity: {
+          x: 5 * Math.cos(Math.random() * Math.PI * 2),
+          y: 5 * Math.sin(Math.random() * Math.PI * 2)
+        }
       })
       engine.world.addPolygon(polygon, {
         vertices: [
@@ -85,11 +94,15 @@ const scene = engine.scene.create({
 
     // --------------------------------------------------------------- rectangle
 
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 5; i++) {
       const rectangle = engine.world.createEntity()
       engine.world.createBody(rectangle, {
         x: 150 * Math.cos(Math.random() * Math.PI * 2),
-        y: 150 * Math.sin(Math.random() * Math.PI * 2)
+        y: 150 * Math.sin(Math.random() * Math.PI * 2),
+        linearVelocity: {
+          x: 5 * Math.cos(Math.random() * Math.PI * 2),
+          y: 5 * Math.sin(Math.random() * Math.PI * 2)
+        }
       })
       engine.world.addRectangle(rectangle, {
         height: 25,
@@ -134,26 +147,29 @@ const scene = engine.scene.create({
     })
 
     // ------------------------------------------------------------------ events
+    engine.world.onBeginContact = function (contact) {
+      const entityA = contact.GetFixtureA().GetBody().GetUserData()
+      const entityB = contact.GetFixtureB().GetBody().GetUserData()
+      if (entityA.tags.includes('player') && entityB.tags.includes('player')) {
+        engine.network.emit('collision')
+      }
+    }
 
     engine.world.onEndContact = function (contact) {
       const entityA = contact.GetFixtureA().GetBody().GetUserData()
       const entityB = contact.GetFixtureB().GetBody().GetUserData()
       if (entityA.tags.includes('player') && entityB.tags.includes('ring')) {
-        engine.network.emit('out')
+        deaths[entityA.id]++
+        engine.network.emit('out', deaths)
         setTimeout(() => {
+          engine.network.emit('reset', deaths)
           engine.world.setAngularVelocity(entityA, 0)
           engine.world.setLinearVelocity(entityA, { x: 0, y: 0 })
-          engine.world.setPosition(entityA, { x: 0, y: 0 })
-        }, 1000)
-      }
-
-      if (entityB.tags.includes('player') && entityA.tags.includes('ring')) {
-        engine.network.emit('out')
-        setTimeout(() => {
-          engine.world.setAngularVelocity(entityB, 0)
-          engine.world.setLinearVelocity(entityB, { x: 0, y: 0 })
-          engine.world.setPosition(entityB, { x: 0, y: 0 })
-        }, 1000)
+          engine.world.setPosition(entityA, {
+            x: 150 * Math.cos(Math.random() * Math.PI * 2),
+            y: 150 * Math.sin(Math.random() * Math.PI * 2)
+          })
+        }, 500)
       }
     }
   },

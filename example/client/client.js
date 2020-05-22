@@ -21,7 +21,9 @@ const scene = engine.scene.create({
     engine.loader.loadImage({ name: 'token', url: './token.png' })
     engine.loader.loadImage({ name: 'arena', url: './arena.jpg' })
     engine.loader.loadImage({ name: 'ball', url: './ball.png' })
-    engine.loader.loadAudio({ name: 'wilhelmscream', url: './wilhelmscream.mp3' })
+    engine.loader.loadAudio({ name: 'wrong', url: './wrong.wav' })
+    engine.loader.loadAudio({ name: 'collision', url: './collision.wav' })
+    engine.loader.loadAudio({ name: 'reset', url: './reset.wav' })
   },
   create: (engine) => {
     engine.inputs.enableKey('w')
@@ -35,17 +37,27 @@ const scene = engine.scene.create({
     engine.inputs.enableKey('2')
     engine.inputs.enableKey(' ')
     engine.inputs.enablePointer('0')
-    engine.render.camera.z = 1
+    engine.render.camera.z = 0.3
 
-    engine.network.on('out', (data) => {
-      engine.audio.play('wilhelmscream')
+    engine.network.on('collision', () => {
+      setTimeout(() => {
+        engine.audio.play('collision')
+      }, 80)
+    })
+
+    engine.network.on('reset', () => {
+      engine.audio.play('reset')
+    })
+
+    engine.network.on('out', (deaths) => {
+      // document.querySelector('#debug').innerHTML = JSON.stringify(deaths, null, 2)
+      engine.audio.play('wrong')
     })
   },
   update: (engine) => {
     // engine.render.fullScreen()
 
     // document.querySelector('#debug').innerHTML = JSON.stringify(engine.inputs.cache, null, 2)
-    // document.querySelector('#debug').innerHTML = JSON.stringify(engine.world.entities[engine.network.clientId], null, 2)
 
     // if player is connected
     if (engine.world.entities[engine.network.clientId]) {
