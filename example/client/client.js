@@ -108,7 +108,21 @@ const scene = engine.scene.create({
 engine.scene.switch(scene)
 engine.start()
 
-// --------------------------------------------------------------------- loading
+// ----------------------------------------------------------------- ui controls
+
+const uiGain = document.querySelector('#ui-gain')
+const uiNickname = document.querySelector('#ui-nickname')
+
+uiGain.addEventListener('change', (event) => {
+  engine.audio.setGain(event.target.value / 100)
+})
+
+uiNickname.addEventListener('input', (event) => {
+  console.log('uiNickname', event.target.value)
+  engine.network.emit('nickname', event.target.value)
+})
+
+// ------------------------------------------------------------------ ui loading
 
 const percent = document.querySelector('#percent')
 const assets = document.querySelector('#assets')

@@ -5,7 +5,7 @@ const Client = function (params) {
   }, params)
   this.socket = config.socket
   this.interpolationDelay = config.interpolationDelay
-  this.clientId = ''
+  this.clientId = null
   this.entities = {}
   this.serverUpdates = []
   this.firstServerTimestamp = 0
@@ -24,6 +24,10 @@ Client.prototype.on = function (name, callback) {
   this.socket.on(name, (data) => {
     callback(data)
   })
+}
+
+Client.prototype.emit = function (name, message) {
+  this.socket.emit(name, message)
 }
 
 Client.prototype.processGameUpdate = function (data) {

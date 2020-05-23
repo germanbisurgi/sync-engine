@@ -32,12 +32,19 @@ const Server = function (params, engine) {
     client.on('client-inputs', (data) => {
       client.inputs.push(data.inputs)
     })
+
+    // when client send a message
+    client.on('message', (data) => {
+      this.onMessage(data)
+    })
   })
 }
 
 Server.prototype.emit = function (name, message) {
   this.socket.emit(name, message)
 }
+
+Server.prototype.onMessage = function () {}
 
 Server.prototype.onConnection = function () {}
 

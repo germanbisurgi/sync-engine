@@ -146,7 +146,8 @@ const scene = engine.scene.create({
       isSensor: true
     })
 
-    // ------------------------------------------------------------------ events
+    // ------------------------------------------------------- collisions events
+
     engine.world.onBeginContact = function (contact) {
       const entityA = contact.GetFixtureA().GetBody().GetUserData()
       const entityB = contact.GetFixtureB().GetBody().GetUserData()
@@ -172,6 +173,12 @@ const scene = engine.scene.create({
         }, 500)
       }
     }
+
+    // ---------------------------------------------------------- network events
+
+    // engine.network.on('nickname', (nickname) => {
+    //   console.log(nickname)
+    // })
   },
   update: (engine) => {
     // physics update
