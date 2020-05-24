@@ -36,10 +36,10 @@ const common = {
 
 const client = Object.assign({}, common, {
   entry: {
-    'sync-engine-client': './src/sync-engine-client.js',
+    'sync-engine-client': './src/sync-engine-client.js'
   },
   output: {
-    path: path.resolve(__dirname, 'example/client/libs'),
+    path: path.resolve(__dirname, 'example/client/assets/js'),
     filename: '[name].js',
     libraryExport: 'default',
     library: 'SyncEngineClient',
@@ -49,10 +49,10 @@ const client = Object.assign({}, common, {
 
 const server = Object.assign({}, common, {
   entry: {
-    'sync-engine-server': './src/sync-engine-server.js',
+    'sync-engine-server': './src/sync-engine-server.js'
   },
   output: {
-    path: path.resolve(__dirname, 'example/server/libs'),
+    path: path.resolve(__dirname, 'example/server'),
     filename: '[name].js',
     libraryExport: 'default',
     library: 'SyncEngineServer',

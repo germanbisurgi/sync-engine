@@ -31,14 +31,15 @@ button {
 #loading {
   background: #000;
   color: #00ff00;
+  display: none;
   height: 100%;
   width: 100%;
   position: absolute;
   z-index: 3;
 }
 
-#loading.hidden {
-  display: none;
+#loading.show {
+  display: block;
 }
 
 #assets {

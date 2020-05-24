@@ -2,7 +2,7 @@ const express = require('express')
 const socketio = require('socket.io')
 const http = require('http')
 const path = require('path')
-const SyncEngineServer = require('./libs/sync-engine-server')
+const SyncEngineServer = require('./sync-engine-server')
 
 const clientPath = path.normalize(path.join(__dirname, '..', 'client'))
 const port = 3000
