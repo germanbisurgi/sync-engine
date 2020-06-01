@@ -26,8 +26,8 @@ Client.prototype.on = function (name, callback) {
   })
 }
 
-Client.prototype.emit = function (name, message) {
-  this.socket.emit(name, message)
+Client.prototype.emit = function (message) {
+  this.socket.emit('message', message)
 }
 
 Client.prototype.processGameUpdate = function (data) {
@@ -38,7 +38,6 @@ Client.prototype.processGameUpdate = function (data) {
 
   this.serverUpdates.push(data)
 
-  // todo: Keep only one game update before the current server time
   const base = this.getBaseUpdate()
   if (base > 0) {
     this.serverUpdates.splice(0, base)
