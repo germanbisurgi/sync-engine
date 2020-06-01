@@ -15,7 +15,6 @@ Pointers.prototype.enable = function (pointer) {
   if (typeof this.cache[pointer] === 'undefined') {
     this.cache[pointer] = new Pointer(pointer)
   }
-  return this.cache[pointer]
 }
 
 Pointers.prototype.get = function (pointer) {
