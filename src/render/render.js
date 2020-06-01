@@ -49,6 +49,8 @@ Render.prototype.run = function () {
 Render.prototype.draw = function () {
   this.clear()
 
+  this.beforeDraw(this)
+
   // camera
 
   this.context.save()
@@ -222,10 +224,37 @@ Render.prototype.draw = function () {
     }
   }
   this.context.restore()
+
+  this.afterDraw(this)
 }
 
 Render.prototype.update = function (entities) {
   this.entities = entities
+}
+
+Render.prototype.beforeDraw = function () {}
+Render.prototype.afterDraw = function () {}
+
+Render.prototype.circle = function (config) {
+  this.context.beginPath()
+  this.context.arc(config.x, config.y, config.radius, 0, 2 * Math.PI)
+  this.context.stroke()
+}
+
+Render.prototype.text = function (config) {
+  this.context.fillText(config.text, config.x, config.y)
+}
+
+Render.prototype.line = function (config) {
+  this.context.beginPath()
+  this.context.moveTo(config.ax, config.ay)
+  this.context.lineTo(config.bx, config.by)
+  this.context.stroke()
+}
+
+Render.prototype.rect = function (config) {
+  this.context.rect(config.x, config.y, config.width, config.height)
+  this.context.stroke()
 }
 
 export default Render
