@@ -5,7 +5,7 @@ const socket = io()
 const engine = new SyncEngineClient({
   network: {
     socket: socket,
-    interpolationDelay: 100
+    interpolationDelay: 1000 / 30
   },
   loop: {
     fps: 60
@@ -31,8 +31,9 @@ uiGain.addEventListener('change', (event) => {
 })
 
 uiNickname.addEventListener('input', (event) => {
-  console.log('uiNickname', event.target.value)
-  engine.network.emit('nickname', event.target.value)
+  engine.network.emit({
+    nickname: event.target.value
+  })
 })
 
 // ------------------------------------------------------------------ ui loading
