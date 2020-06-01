@@ -88,8 +88,10 @@ World.prototype.getEntity = function (id) {
 }
 
 World.prototype.destroyEntity = function (entity) {
-  this.destroyBody(entity)
-  delete this.entities[entity.id]
+  if (entity) {
+    this.destroyBody(entity)
+    delete this.entities[entity.id]
+  }
 }
 
 World.prototype.createId = function () {
@@ -103,62 +105,67 @@ World.prototype.createId = function () {
 // ---------------------------------------------------------------------- bodies
 
 World.prototype.destroyBody = function (entity) {
-  const body = this.getBody(entity.id)
-  this.world.DestroyBody(body)
-  delete this.bodies[entity.id]
+  if (entity) {
+    entity.debug = {}
+    const body = this.getBody(entity.id)
+    this.world.DestroyBody(body)
+    delete this.bodies[entity.id]
+  }
 }
 
 World.prototype.createBody = function (entity, params) {
-  const config = Object.assign({
-    x: 0,
-    y: 0,
-    type: 'dynamic',
-    active: true,
-    allowSleep: true,
-    awake: true,
-    bullet: false,
-    fixedRotation: false,
-    angle: 0,
-    angularDamping: 0,
-    angularVelocity: 0,
-    linearDamping: 0,
-    linearVelocity: { x: 0, y: 0 },
-    userData: entity
-  }, params)
+  if (entity) {
+    const config = Object.assign({
+      x: 0,
+      y: 0,
+      type: 'dynamic',
+      active: true,
+      allowSleep: true,
+      awake: true,
+      bullet: false,
+      fixedRotation: false,
+      angle: 0,
+      angularDamping: 0,
+      angularVelocity: 0,
+      linearDamping: 0,
+      linearVelocity: { x: 0, y: 0 },
+      userData: entity
+    }, params)
 
-  const B2BodyDef = Box2D.Dynamics.b2BodyDef
-  const B2Body = Box2D.Dynamics.b2Body
-  const bodyDef = new B2BodyDef()
-  bodyDef.position.x = config.x / this.scale
-  bodyDef.position.y = config.y / this.scale
-  bodyDef.active = config.active
-  bodyDef.allowSleep = config.allowSleep
-  bodyDef.awake = config.awake
-  bodyDef.bullet = config.bullet
-  bodyDef.fixedRotation = config.fixedRotation
-  bodyDef.angle = config.angle
-  bodyDef.angularDamping = config.angularDamping
-  bodyDef.angularVelocity = config.angularVelocity
-  bodyDef.linearDamping = config.linearDamping
-  bodyDef.linearVelocity = config.linearVelocity
-  bodyDef.userData = config.userData
+    const B2BodyDef = Box2D.Dynamics.b2BodyDef
+    const B2Body = Box2D.Dynamics.b2Body
+    const bodyDef = new B2BodyDef()
+    bodyDef.position.x = config.x / this.scale
+    bodyDef.position.y = config.y / this.scale
+    bodyDef.active = config.active
+    bodyDef.allowSleep = config.allowSleep
+    bodyDef.awake = config.awake
+    bodyDef.bullet = config.bullet
+    bodyDef.fixedRotation = config.fixedRotation
+    bodyDef.angle = config.angle
+    bodyDef.angularDamping = config.angularDamping
+    bodyDef.angularVelocity = config.angularVelocity
+    bodyDef.linearDamping = config.linearDamping
+    bodyDef.linearVelocity = config.linearVelocity
+    bodyDef.userData = config.userData
 
-  if (config.type === 'static') {
-    bodyDef.type = B2Body.b2_staticBody
+    if (config.type === 'static') {
+      bodyDef.type = B2Body.b2_staticBody
+    }
+
+    if (config.type === 'dynamic') {
+      bodyDef.type = B2Body.b2_dynamicBody
+    }
+
+    if (config.type === 'kinematic') {
+      bodyDef.type = B2Body.b2_kinematicBody
+    }
+
+    const body = this.world.CreateBody(bodyDef)
+    body.active = true
+    this.bodies[entity.id] = body
+    return body
   }
-
-  if (config.type === 'dynamic') {
-    bodyDef.type = B2Body.b2_dynamicBody
-  }
-
-  if (config.type === 'kinematic') {
-    bodyDef.type = B2Body.b2_kinematicBody
-  }
-
-  const body = this.world.CreateBody(bodyDef)
-  body.active = true
-  this.bodies[entity.id] = body
-  return body
 }
 
 World.prototype.getBody = function (entityId) {
@@ -180,30 +187,32 @@ World.prototype.getFixtureDef = function (config) {
 // ---------------------------------------------------------------------- circle
 
 World.prototype.addCircle = function (entity, params) {
-  const config = Object.assign({
-    x: 0,
-    y: 0,
-    radius: 25,
-    density: 1,
-    friction: 0.5,
-    restitution: 0.5,
-    isSensor: false
-  }, params)
-  const fixtureDefinition = this.getFixtureDef(config)
-  const B2CircleShape = Box2D.Collision.Shapes.b2CircleShape
-  const fixtureDef = fixtureDefinition
-  fixtureDef.shape = new B2CircleShape(config.radius / this.scale)
-  fixtureDef.shape.m_p = {
-    x: config.x / this.scale,
-    y: config.y / this.scale
-  }
-  const body = this.getBody(entity.id)
-  body.CreateFixture(fixtureDef)
+  if (entity) {
+    const config = Object.assign({
+      x: 0,
+      y: 0,
+      radius: 25,
+      density: 1,
+      friction: 0.5,
+      restitution: 0.5,
+      isSensor: false
+    }, params)
+    const fixtureDefinition = this.getFixtureDef(config)
+    const B2CircleShape = Box2D.Collision.Shapes.b2CircleShape
+    const fixtureDef = fixtureDefinition
+    fixtureDef.shape = new B2CircleShape(config.radius / this.scale)
+    fixtureDef.shape.m_p = {
+      x: config.x / this.scale,
+      y: config.y / this.scale
+    }
+    const body = this.getBody(entity.id)
+    body.CreateFixture(fixtureDef)
 
-  if (this.debug) {
-    entity.debug = {
-      shape: 'circle',
-      radius: config.radius
+    if (this.debug) {
+      entity.debug = {
+        shape: 'circle',
+        radius: config.radius
+      }
     }
   }
 }
@@ -211,39 +220,41 @@ World.prototype.addCircle = function (entity, params) {
 // ------------------------------------------------------------------- rectangle
 
 World.prototype.addRectangle = function (entity, params) {
-  const config = Object.assign({
-    width: 50,
-    height: 50,
-    x: 0,
-    y: 0,
-    density: 1,
-    friction: 0.5,
-    restitution: 0.5,
-    isSensor: false
-  }, params)
-  const fixtureDef = this.getFixtureDef(config)
-  const B2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape
-  fixtureDef.shape = new B2PolygonShape()
-  fixtureDef.shape.SetAsBox(
-    config.width * 0.5 / this.scale,
-    config.height * 0.5 / this.scale
-  )
-  for (let i = 0; i < fixtureDef.shape.m_vertices.length; i++) {
-    const vert = fixtureDef.shape.m_vertices[i]
-    vert.x += config.x / this.scale || 0
-    vert.y += config.y / this.scale || 0
-  }
-  fixtureDef.shape.m_centroid.x += config.x / this.scale || 0
-  fixtureDef.shape.m_centroid.y += config.y / this.scale || 0
+  if (entity) {
+    const config = Object.assign({
+      width: 50,
+      height: 50,
+      x: 0,
+      y: 0,
+      density: 1,
+      friction: 0.5,
+      restitution: 0.5,
+      isSensor: false
+    }, params)
+    const fixtureDef = this.getFixtureDef(config)
+    const B2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape
+    fixtureDef.shape = new B2PolygonShape()
+    fixtureDef.shape.SetAsBox(
+      config.width * 0.5 / this.scale,
+      config.height * 0.5 / this.scale
+    )
+    for (let i = 0; i < fixtureDef.shape.m_vertices.length; i++) {
+      const vert = fixtureDef.shape.m_vertices[i]
+      vert.x += config.x / this.scale || 0
+      vert.y += config.y / this.scale || 0
+    }
+    fixtureDef.shape.m_centroid.x += config.x / this.scale || 0
+    fixtureDef.shape.m_centroid.y += config.y / this.scale || 0
 
-  const body = this.getBody(entity.id)
-  body.CreateFixture(fixtureDef)
+    const body = this.getBody(entity.id)
+    body.CreateFixture(fixtureDef)
 
-  if (this.debug) {
-    entity.debug = {
-      shape: 'rectangle',
-      w: config.width,
-      h: config.height
+    if (this.debug) {
+      entity.debug = {
+        shape: 'rectangle',
+        w: config.width,
+        h: config.height
+      }
     }
   }
 }
@@ -251,35 +262,37 @@ World.prototype.addRectangle = function (entity, params) {
 // ----------------------------------------------------------------------- edges
 
 World.prototype.addEdges = function (entity, params) {
-  const config = Object.assign({
-    ax: 0,
-    ay: 0,
-    bx: 0,
-    by: 0,
-    vertices: [],
-    density: 1,
-    friction: 0.5,
-    restitution: 0.5,
-    isSensor: false
-  }, params)
+  if (entity) {
+    const config = Object.assign({
+      ax: 0,
+      ay: 0,
+      bx: 0,
+      by: 0,
+      vertices: [],
+      density: 1,
+      friction: 0.5,
+      restitution: 0.5,
+      isSensor: false
+    }, params)
 
-  for (let i = 0; i < config.vertices.length; i++) {
-    const fixtureDef = this.getFixtureDef(config)
-    const B2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape
-    fixtureDef.shape = new B2PolygonShape()
-    config.ax = config.vertices[i].x / this.scale
-    config.ay = config.vertices[i].y / this.scale
-    config.bx = typeof config.vertices[i + 1] !== 'undefined' ? config.vertices[i + 1].x / this.scale : config.vertices[0].x / this.scale
-    config.by = typeof config.vertices[i + 1] !== 'undefined' ? config.vertices[i + 1].y / this.scale : config.vertices[0].y / this.scale
-    fixtureDef.shape.SetAsEdge({ x: config.ax, y: config.ay }, { x: config.bx, y: config.by })
-    const body = this.getBody(entity.id)
-    body.CreateFixture(fixtureDef)
-  }
+    for (let i = 0; i < config.vertices.length; i++) {
+      const fixtureDef = this.getFixtureDef(config)
+      const B2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape
+      fixtureDef.shape = new B2PolygonShape()
+      config.ax = config.vertices[i].x / this.scale
+      config.ay = config.vertices[i].y / this.scale
+      config.bx = typeof config.vertices[i + 1] !== 'undefined' ? config.vertices[i + 1].x / this.scale : config.vertices[0].x / this.scale
+      config.by = typeof config.vertices[i + 1] !== 'undefined' ? config.vertices[i + 1].y / this.scale : config.vertices[0].y / this.scale
+      fixtureDef.shape.SetAsEdge({ x: config.ax, y: config.ay }, { x: config.bx, y: config.by })
+      const body = this.getBody(entity.id)
+      body.CreateFixture(fixtureDef)
+    }
 
-  if (this.debug) {
-    entity.debug = {
-      shape: 'edges',
-      vertices: config.vertices
+    if (this.debug) {
+      entity.debug = {
+        shape: 'edges',
+        vertices: config.vertices
+      }
     }
   }
 }
@@ -287,41 +300,43 @@ World.prototype.addEdges = function (entity, params) {
 // --------------------------------------------------------------------- polygon
 
 World.prototype.addPolygon = function (entity, params) {
-  const config = Object.assign({
-    vertices: [],
-    x: 0,
-    y: 0,
-    density: 1,
-    friction: 0.5,
-    restitution: 0.5,
-    isSensor: false
-  }, params)
-  const fixtureDef = this.getFixtureDef(config)
-  const B2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape
-  fixtureDef.shape = new B2PolygonShape()
-  for (let i = 0; i < config.vertices.length; i++) {
-    const vert = config.vertices[i]
-    vert.x /= this.scale
-    vert.y /= this.scale
-  }
-  fixtureDef.shape.SetAsArray(config.vertices, config.vertices.length)
-  for (let i = 0; i < fixtureDef.shape.m_vertices.length; i++) {
-    const vert = fixtureDef.shape.m_vertices[i]
-    vert.x += config.x / this.scale || 0
-    vert.y += config.y / this.scale || 0
-  }
-  const body = this.getBody(entity.id)
-  body.CreateFixture(fixtureDef)
-
-  if (this.debug) {
+  if (entity) {
+    const config = Object.assign({
+      vertices: [],
+      x: 0,
+      y: 0,
+      density: 1,
+      friction: 0.5,
+      restitution: 0.5,
+      isSensor: false
+    }, params)
+    const fixtureDef = this.getFixtureDef(config)
+    const B2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape
+    fixtureDef.shape = new B2PolygonShape()
     for (let i = 0; i < config.vertices.length; i++) {
       const vert = config.vertices[i]
-      vert.x *= this.scale
-      vert.y *= this.scale
+      vert.x /= this.scale
+      vert.y /= this.scale
     }
-    entity.debug = {
-      shape: 'polygon',
-      vertices: config.vertices
+    fixtureDef.shape.SetAsArray(config.vertices, config.vertices.length)
+    for (let i = 0; i < fixtureDef.shape.m_vertices.length; i++) {
+      const vert = fixtureDef.shape.m_vertices[i]
+      vert.x += config.x / this.scale || 0
+      vert.y += config.y / this.scale || 0
+    }
+    const body = this.getBody(entity.id)
+    body.CreateFixture(fixtureDef)
+
+    if (this.debug) {
+      for (let i = 0; i < config.vertices.length; i++) {
+        const vert = config.vertices[i]
+        vert.x *= this.scale
+        vert.y *= this.scale
+      }
+      entity.debug = {
+        shape: 'polygon',
+        vertices: config.vertices
+      }
     }
   }
 }
@@ -329,30 +344,36 @@ World.prototype.addPolygon = function (entity, params) {
 // --------------------------------------------------------------------- getters
 
 World.prototype.getPosition = function (entity) {
-  const body = this.getBody(entity.id)
-  if (body) {
-    const position = body.GetPosition()
-    return {
-      x: position.x * this.scale,
-      y: position.y * this.scale
+  if (entity) {
+    const body = this.getBody(entity.id)
+    if (body) {
+      const position = body.GetPosition()
+      return {
+        x: position.x * this.scale,
+        y: position.y * this.scale
+      }
     }
   }
 }
 
 World.prototype.getAngle = function (entity) {
-  const body = this.getBody(entity.id)
-  if (body) {
-    return body.GetAngle()
+  if (entity) {
+    const body = this.getBody(entity.id)
+    if (body) {
+      return body.GetAngle()
+    }
   }
 }
 
 World.prototype.getLinearVelocity = function (entity) {
-  const body = this.getBody(entity.id)
-  if (body) {
-    const linearVelocity = body.GetLinearVelocity()
-    return {
-      x: linearVelocity.x * this.scale,
-      y: linearVelocity.y * this.scale
+  if (entity) {
+    const body = this.getBody(entity.id)
+    if (body) {
+      const linearVelocity = body.GetLinearVelocity()
+      return {
+        x: linearVelocity.x * this.scale,
+        y: linearVelocity.y * this.scale
+      }
     }
   }
 }
@@ -364,56 +385,77 @@ World.prototype.setGravity = function (config) {
 }
 
 World.prototype.setPosition = function (entity, config) {
-  const body = this.getBody(entity.id)
-  if (body) {
-    body.SetPosition({
-      x: config.x / this.scale,
-      y: config.y / this.scale
-    })
+  if (entity) {
+    const body = this.getBody(entity.id)
+    if (body) {
+      body.SetPosition({
+        x: config.x / this.scale,
+        y: config.y / this.scale
+      })
+    }
+  }
+}
+
+World.prototype.setAngle = function (entity, angle) {
+  if (entity) {
+    const body = this.getBody(entity.id)
+    if (body) {
+      body.SetAngle(angle)
+    }
   }
 }
 
 World.prototype.setAngularVelocity = function (entity, omega) {
-  const body = this.getBody(entity.id)
-  if (body) {
-    body.SetAngularVelocity(omega)
+  if (entity) {
+    const body = this.getBody(entity.id)
+    if (body) {
+      body.SetAngularVelocity(omega)
+    }
   }
 }
 
 World.prototype.setLinearVelocity = function (entity, config) {
-  const body = this.getBody(entity.id)
-  if (body) {
-    body.SetLinearVelocity({
-      x: config.x / this.scale,
-      y: config.y / this.scale
-    })
+  if (entity) {
+    const body = this.getBody(entity.id)
+    if (body) {
+      body.SetLinearVelocity({
+        x: config.x / this.scale,
+        y: config.y / this.scale
+      })
+    }
   }
 }
 
 // ---------------------------------------------------------------------- forces
 
 World.prototype.applyForce = function (entity, config) {
-  const body = this.getBody(entity.id)
-  if (body) {
-    body.ApplyForce(config, body.GetWorldCenter())
+  if (entity) {
+    const body = this.getBody(entity.id)
+    if (body) {
+      body.ApplyForce(config, body.GetWorldCenter())
+    }
   }
 }
 
 World.prototype.applyTorque = function (entity, torque) {
-  const body = this.getBody(entity.id)
-  if (body) {
-    body.SetActive(true)
-    body.SetAwake(true)
-    body.ApplyTorque(torque / this.scale)
+  if (entity) {
+    const body = this.getBody(entity.id)
+    if (body) {
+      body.SetActive(true)
+      body.SetAwake(true)
+      body.ApplyTorque(torque / this.scale)
+    }
   }
 }
 
 // -------------------------------------------------------------------- impulses
 
 World.prototype.applyImpulse = function (entity, config) {
-  const body = this.getBody(entity.id)
-  if (body) {
-    body.ApplyImpulse(config, body.GetWorldCenter())
+  if (entity) {
+    const body = this.getBody(entity.id)
+    if (body) {
+      body.ApplyImpulse(config, body.GetWorldCenter())
+    }
   }
 }
 
